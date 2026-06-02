@@ -1,0 +1,136 @@
+# Plano de Melhorias — Sistema de Cadastro de Máquinas Alocadas
+
+
+## 🔴 CRÍTICO — Bugs que quebram funcionalidade
+
+
+### 1. Campo `#serial` inexistente em `machines.html`
+- **Problema:** O JS salva `serial: document.getElementById('serial').value.trim()` mas o formulário não tem esse input. A coluna "Serial" sempre salva `undefined`.
+- **Correção:** Adicionar `<input id="serial" placeholder="Serial">` ao formulário.
+
+
+### 2. Botão `#exportBtn` inexistente em `machines.html`
+- **Problema:** `document.getElementById('exportBtn').addEventListener(...)` é chamado na inicialização mas o botão não existe, gerando erro de runtime que quebra outros listeners.
+- **Correção:** Criar o botão no HTML ou corrigir o seletor para o elemento correto.
+
+
+### 3. HTML malformado em `departments.html`
+- **Linha ~14:** `<input id="matricula do Responsável">` solto dentro do bloco `<style>`, sem label nem wrapper.
+- **Linha ~47:** `<div class="address-row">` aberto dentro de um `<li>` da sidebar, quebrando a estrutura do nav.
+- **Correção:** Remover os elementos órfãos (o input de matrícula já existe corretamente mais abaixo).
+
+
+---
+
+
+## 🟠 ALTO — Qualidade e confiabilidade
+
+
+### 4. Função `escapeHtml()` duplicada em 3 arquivos
+- **Arquivos:** `fila.html`, `machines.html`, `departments.html`
+- **Problema:** Mesma função copiada em cada arquivo; qualquer mudança precisa ser feita em 3 lugares. Mesmo problema com `load()`, `save()` e lógica de CSV.
+- **Correção:** Criar `utils.js` com essas funções e importar com `<script src="utils.js">` em todos os HTMLs.
+
+
+### 5. Race condition de índice em `fila.html`
+- **Linha ~125**
+- **Problema:** O handler de `change` captura o índice `i` no momento da renderização. Se outro item for deletado em outra aba, `l[i] = c` sobrescreve o item errado.
+- **Correção:** Usar um `id` único por chamado (ex: `Date.now()`) e buscar por id ao salvar, em vez de usar índice.
+
+
+### 6. Sem mensagem de estado vazio nas tabelas
+- **Arquivos:** `fila.html`, `machines.html`, `departments.html`
+- **Problema:** Quando não há registros, as tabelas ficam visualmente vazias sem feedback ao usuário.
+- **Correção:** Exibir `<tr><td colspan="N">Nenhum registro encontrado.</td></tr>` quando a lista estiver vazia.
+
+
+### 7. Import CSV sem validação de arquivo
+- **Arquivos:** `machines.html`, `departments.html`
+- **Problema:** Arquivos grandes podem travar o navegador; o regex de parsing não verifica null antes de `.map()`.
+- **Correção:** Verificar tamanho máximo (~1 MB) e adicionar null check no resultado do `match()`.
+
+
+---
+
+
+## 🟡 MÉDIO — UX e consistência visual
+
+
+### 8. Estilos inline que deveriam ser classes CSS
+- **Problema:** Botões de deletar usam `style="background:#d9534f"` inline em 3 arquivos; labels de import têm estilos longos repetidos inline.
+- **Correção:** Adicionar classes `.btn-danger` e `.btn-import` ao `styles.css` e substituir todos os inline styles.
+
+
+### 9. Grids sem responsividade em mobile
+- **Arquivos:** `fila.html` (3 colunas), `departments.html` (form 2 colunas), `unidades.html` (2 colunas)
+- **Problema:** Grades fixas quebram em telas pequenas; `styles.css` tem apenas um breakpoint para a sidebar.
+- **Correção:** Adicionar `@media (max-width: 640px)` para empilhar os grids em coluna única.
+
+
+### 10. Inconsistência de `max-width` e espaçamentos entre páginas
+- `index.html`: 960px | `unidades.html`: 760px | `machines.html`: 980px | `departments.html`: 760px
+- Gaps de formulário variam: 8px, 12px, 14px sem padrão.
+- **Correção:** Padronizar `max-width: 960px` e `gap: 12px` em todas as páginas.
+
+
+### 11. Botão "Excluir" que executa "Limpar" em `departments.html`
+- **Linha ~336**
+- **Problema:** O `#clearBtn` está rotulado como "Excluir" mas executa `form.reset()`, confundindo o usuário.
+- **Correção:** Renomear o rótulo do botão para "Limpar".
+
+
+### 12. Sidebar duplicada em todos os arquivos
+- **Problema:** O bloco `<nav>` com os 5 links é copiado manualmente em cada arquivo; novo item exige edição em 5 lugares.
+- **Correção:** Extrair para `sidebar.js` que injeta o HTML via JavaScript, ou usar `<template>`.
+
+
+---
+
+
+## 🔵 BAIXO — Acessibilidade e boas práticas
+
+
+### 13. Sem estados de foco visíveis
+- `styles.css` não define `:focus` ou `:focus-visible` para inputs, botões e links.
+- **Correção:** Adicionar `outline: 2px solid #0366d6; outline-offset: 2px` ao `:focus-visible` global.
+
+
+### 14. Sem atributos ARIA nos componentes interativos
+- Botões de editar/deletar gerados dinamicamente não têm `aria-label`.
+- A barra de busca da sidebar não tem `aria-label`.
+- **Correção:** Adicionar `aria-label="Editar registro"` e `aria-label="Excluir registro"` nos botões das tabelas.
+
+
+### 15. Validação de entrada insuficiente
+- Campos como `patrimônio`, `matrícula`, `CEP` e `telefone` aceitam qualquer string sem limite.
+- **Correção:** Adicionar atributos `pattern` e `maxlength` nos inputs HTML para validação nativa do browser.
+
+
+---
+
+
+## Resumo por arquivo
+
+
+| Arquivo | Correções necessárias |
+|---------|-----------------------|
+| `machines.html` | #1, #2, #4, #6, #7, #8, #9 |
+| `departments.html` | #3, #4, #6, #7, #8, #9, #10, #11 |
+| `fila.html` | #4, #5, #6, #8, #9 |
+| `unidades.html` | #8, #9, #10 |
+| `styles.css` | #8, #9, #13 |
+| `utils.js` *(novo)* | #4, #12 |
+
+
+---
+
+
+## Verificação após implementação
+
+
+1. Cadastrar máquina em `machines.html` → "Serial" deve salvar corretamente
+2. Clicar em Exportar CSV em `machines.html` → sem erros no console
+3. Inspecionar `departments.html` → sem elementos HTML órfãos
+4. Redimensionar janela para 375px → todos os grids empilham em coluna única
+5. Navegar por todas as páginas com Tab → outline de foco deve ser visível
+6. Esvaziar localStorage e abrir `fila.html` → exibir mensagem "Nenhum registro encontrado"

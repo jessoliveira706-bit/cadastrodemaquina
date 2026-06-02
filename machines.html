@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Máquinas - Cadastro</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:980px;margin:24px auto;padding:0 16px;color:#222}
+    header{display:flex;align-items:center;gap:12px}
+    a.back{color:#0366d6;text-decoration:none}
+    h1{font-size:20px;margin-bottom:8px}
+    form{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+    label{display:block;font-size:13px}
+    input,select{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px}
+    /* Campo Patrimônio menor */
+    input#tag{width:160px;max-width:100%}
+    .full{grid-column:1 / -1}
+    .controls{display:flex;gap:8px;align-items:center}
+    button{padding:8px 12px;border:none;background:#0366d6;color:#fff;border-radius:4px;cursor:pointer}
+    button.secondary{background:#6c757d}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{border:1px solid #e6e6e6;padding:8px;text-align:left;font-size:13px}
+    th{background:#f6f8fa}
+    .actions button{margin-right:6px;padding:6px 8px}
+    .muted{color:#666;font-size:13px}
+    input[type=file]{display:none}
+    .row-count{font-size:13px;margin-left:auto}
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="utils.js"></script>
+</head>
+<body>
+  <a href="index.html" id="logo-link"><img id="site-logo" src="logo_secretaria_gecotec.png" alt="Logotipo"></a>
+  <button id="btnSair" class="btn-sair" title="Sair"><i data-lucide="log-out"></i></button>
+  <div class="sidebar">
+    <div class="user-avatar" id="userAvatar">U</div>
+    <nav>
+      <ul>
+        <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
+        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
+        <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
+        <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
+        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        </ul>
+    </nav>
+  </div>
+  <header>
+    <a class="back" href="index.html">← Voltar</a>
+    <h1>Cadastro de Máquinas Alocadas</h1>
+  </header>
+  <p class="muted">Formulário para registrar, editar e exportar máquinas alocadas (dados salvos localmente).</p>
+
+
+  <form id="machineForm">
+    <input type="hidden" id="idx" />
+
+
+    <div>
+      <label>Patrimônio</label>
+      <input id="tag" required />
+    </div>
+
+
+    <div>
+      <label>Tipo de máquina</label>
+      <input id="model" />
+    </div>
+
+
+ 
+    <div>
+      <label>Serial</label>
+      <input id="serial" />
+    </div>
+
+    <div>
+      <label>Responsável</label>
+      <input id="owner" />
+    </div>
+
+
+    <div>
+      <label>Localização</label>
+      <input id="location" />
+    </div>
+
+
+    <div>
+      <label>Status</label>
+      <select id="status">
+        <option value="Alocada">Alocada</option>
+        <option value="Disponível">Disponível</option>
+        <option value="Manutenção">Manutenção</option>
+        <option value="Devolução">Devolução</option>
+      </select>
+    </div>
+
+
+    <div>
+      <label>Data de alocação</label>
+      <input id="date" type="date" />
+    </div>
+
+
+    <div class="full controls">
+      <button type="submit">Salvar</button>
+      <button type="button" class="secondary" id="clearBtn">Limpar</button>
+      <button type="button" id="exportBtn" class="secondary" style="margin-left:auto">Exportar CSV</button>
+      <label for="importFile" class="secondary" style="cursor:pointer;padding:8px 12px;border-radius:4px;background:#5654f0;color:#f8f6f6;margin-left:8px">Importar Arquivos</label>
+      <input id="importFile" type="file" accept="text/csv" />
+      <span class="row-count" id="count">0 itens</span>
+    </div>
+  </form>
+
+
+  <table id="machinesTable">
+    <thead>
+      <tr>
+        <th>Tag</th>
+        <th>Modelo</th>
+        <th>Serial</th>
+        <th>Responsável</th>
+        <th>Localização</th>
+        <th>Status</th>
+        <th>Data</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+
+  <script>
+    const STORAGE_KEY = 'machines_alocadas_v1'
+    const form = document.getElementById('machineForm')
+    const tbody = document.querySelector('#machinesTable tbody')
+    const countEl = document.getElementById('count')
+
+
+    function load(){
+      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }catch(e){return[]}
+    }
+
+
+    function save(list){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+      render()
+    }
+
+
+    function render(){
+      const list = load()
+      tbody.innerHTML = ''
+      list.forEach((m, i)=>{
+        const tr = document.createElement('tr')
+        tr.innerHTML = `
+          <td>${escapeHtml(m.tag)}</td>
+          <td>${escapeHtml(m.model)}</td>
+          <td>${escapeHtml(m.serial)}</td>
+          <td>${escapeHtml(m.owner)}</td>
+          <td>${escapeHtml(m.location)}</td>
+          <td>${escapeHtml(m.status)}</td>
+          <td>${escapeHtml(m.date)}</td>
+          <td class="actions">
+            <button onclick="edit(${i})">Editar</button>
+            <button onclick="del(${i})" style="background:#d9534f">Remover</button>
+          </td>
+        `
+        tbody.appendChild(tr)
+      })
+      countEl.textContent = `${list.length} itens`
+    }
+
+
+    form.addEventListener('submit', e=>{
+      e.preventDefault()
+      const idx = document.getElementById('idx').value
+      const item = {
+        tag: document.getElementById('tag').value.trim(),
+        model: document.getElementById('model').value.trim(),
+        serial: document.getElementById('serial').value.trim(),
+        owner: document.getElementById('owner').value.trim(),
+        location: document.getElementById('location').value.trim(),
+        status: document.getElementById('status').value,
+        date: document.getElementById('date').value
+      }
+      if(!item.tag){ alert('Informe a Tag / Patrimônio'); return }
+      const list = load()
+      if(idx===''){
+        list.push(item)
+      } else {
+        list[Number(idx)] = item
+      }
+      save(list)
+      form.reset()
+      document.getElementById('idx').value = ''
+    })
+
+
+    document.getElementById('clearBtn').addEventListener('click', ()=>{ form.reset(); document.getElementById('idx').value=''; })
+
+
+    window.edit = function(i){
+      const list = load(); const m = list[i]
+      if(!m) return
+      document.getElementById('idx').value = i
+      document.getElementById('tag').value = m.tag
+      document.getElementById('model').value = m.model
+      document.getElementById('serial').value = m.serial
+      document.getElementById('owner').value = m.owner
+      document.getElementById('location').value = m.location
+      document.getElementById('status').value = m.status
+      document.getElementById('date').value = m.date
+      window.scrollTo({top:0,behavior:'smooth'})
+    }
+
+
+    window.del = function(i){
+      if(!confirm('Remover este registro?')) return
+      const list = load(); list.splice(i,1); save(list)
+    }
+
+
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const list = load()
+      if(list.length===0){ alert('Nenhum dado para exportar'); return }
+      const header = ['tag','model','serial','owner','location','status','date']
+      const rows = [header.join(',')].concat(list.map(r=>header.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')))
+      const csv = rows.join('\n')
+      const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'})
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = 'maquinas.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url)
+    })
+
+
+    document.getElementById('importFile').addEventListener('change', async e=>{
+      const f = e.target.files[0]; if(!f) return
+      const text = await f.text()
+      try{
+        const lines = text.split(/\r?\n/).filter(Boolean)
+        const header = lines.shift().split(/,/) .map(h=>h.replace(/(^"|"$)/g,''))
+        const list = lines.map(l=>{
+          const cols = l.match(/(?:\"([^\"]*)\"|([^,]*))(?:,|$)/g).map(c=>c.replace(/(^,|,$)/g,''))
+          const obj = {}
+          header.forEach((h,idx)=>{ obj[h.trim()] = (cols[idx]||'').replace(/^"|"$/g,'') })
+          return obj
+        })
+        const existing = load()
+        save(existing.concat(list))
+        e.target.value = ''
+      }catch(err){ alert('Falha ao importar CSV: formato inválido') }
+    })
+
+
+    render()
+    if (typeof lucide !== 'undefined') lucide.createIcons()
+  </script>
+</body>
+</html>

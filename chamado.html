@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chamado - Cadastro</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:16px auto;padding:0 16px;color:#222}
+    header{display:flex;align-items:center;gap:8px}
+    a.back{color:#0366d6;text-decoration:none;font-size:13px}
+    h1{font-size:16px;margin-bottom:4px}
+    form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    label{display:block;font-size:12px}
+    input,select,textarea{width:100%;padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;box-sizing:border-box;margin-top:2px}
+    .full{grid-column:1/-1}
+    .controls{display:flex;gap:6px;align-items:center;margin-top:4px}
+    button{padding:4px 10px;border:none;background:#0366d6;color:#fff;border-radius:3px;cursor:pointer;font-size:12px}
+    button.secondary{background:#6c757d}
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="utils.js"></script>
+</head>
+<body>
+  <a href="index.html" id="logo-link"><img id="site-logo" src="logo_secretaria_gecotec.png" alt="Logotipo"></a>
+  <button id="btnSair" class="btn-sair" title="Sair"><i data-lucide="log-out"></i></button>
+  <div class="sidebar">
+    <div class="user-avatar" id="userAvatar">U</div>
+    <nav>
+      <ul>
+        <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
+        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
+        <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
+        <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
+        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        </ul>
+    </nav>
+  </div>
+  <header>
+    <a class="back" href="fila.html">← Voltar</a>
+    <h1>Cadastro de Chamado</h1>
+  </header>
+
+  <form id="callForm">
+    <input type="hidden" id="idx" />
+
+    <div>
+      <label>Máquina</label>
+      <input id="machine" required />
+    </div>
+    <div>
+      <label>Departamento</label>
+      <input id="dept" />
+    </div>
+    <div class="full">
+      <label>Descrição</label>
+      <textarea id="desc" rows="2"></textarea>
+    </div>
+    <div>
+      <label>Status</label>
+      <select id="status">
+        <option value="Aguardando">Aguardando</option>
+        <option value="Em manutenção">Em manutenção</option>
+        <option value="Entregue">Entregue</option>
+      </select>
+    </div>
+    <div class="full controls">
+      <button type="submit">Salvar</button>
+      <button type="button" class="secondary" id="clearBtn">Limpar</button>
+    </div>
+  </form>
+
+  <script>
+    const KEY = 'calls_v1'
+    const form = document.getElementById('callForm')
+
+    function load(){
+      try{ return JSON.parse(localStorage.getItem(KEY) || '[]') }catch(e){return[]}
+    }
+    function save(list){ localStorage.setItem(KEY, JSON.stringify(list)) }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault()
+      const idx = document.getElementById('idx').value
+      const item = {
+        machine: document.getElementById('machine').value.trim(),
+        dept: document.getElementById('dept').value.trim(),
+        desc: document.getElementById('desc').value.trim(),
+        status: document.getElementById('status').value
+      }
+      if(!item.machine){ alert('Informe a máquina'); return }
+      const list = load()
+      if(idx === '') list.push(item); else list[Number(idx)] = item
+      save(list)
+      form.reset(); document.getElementById('idx').value = ''
+      alert('Chamado salvo!')
+    })
+
+    window.edit = function(i){
+      const list = load(); const c = list[i]; if(!c) return
+      document.getElementById('idx').value = i
+      document.getElementById('machine').value = c.machine
+      document.getElementById('dept').value = c.dept
+      document.getElementById('desc').value = c.desc
+      document.getElementById('status').value = c.status
+      window.scrollTo({top:0,behavior:'smooth'})
+    }
+
+    document.getElementById('clearBtn').addEventListener('click', () => { form.reset(); document.getElementById('idx').value = '' })
+
+    const editIdx = sessionStorage.getItem('editCallIdx')
+    if(editIdx !== null){
+      sessionStorage.removeItem('editCallIdx')
+      window.edit(Number(editIdx))
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons()
+  </script>
+</body>
+</html>

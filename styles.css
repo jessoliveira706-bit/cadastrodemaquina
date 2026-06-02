@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* Background image with white base (place your image as `bg.png` in this folder) */
+html, body {
+  min-height: 100%;
+  background-color: #ffffff;
+  color: #222;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+
+
+body {
+  background-image: url('bg.png');
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: contain;
+  background-attachment: fixed;
+}
+
+
+/* Remove marcadores de todas as listas */
+ul { list-style: none; padding: 0; margin: 0; }
+
+/* Improve contrast for interactive elements */
+a { color: #0366d6; }
+.card { background: rgba(255,255,255,0.95); }
+button { background-color: #0366d6; color: #fff; cursor: pointer; }
+button.secondary { background-color: #6c757d; color: #fff; }
+button:hover { filter: brightness(1.1); }
+button:active { transform: scale(0.97); }
+
+
+/* Faixa verde fina no topo */
+html::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3cm;
+  background: #188331;
+  z-index: 1001;
+}
+
+/* Logotipo fixo no canto superior esquerdo */
+#logo-link { position: fixed; top: 0.5cm; left: 0.5cm; z-index: 1002; display: block; }
+#site-logo { height: 1.5cm; width: auto; display: block; background: #fff; padding: 3px; border-radius: 4px; }
+
+/* Botão Voltar fixo na faixa verde abaixo da logo */
+a.back {
+  position: fixed;
+  top: 2.6cm;
+  left: 0.5cm;
+  z-index: 1002;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.9;
+  transition: opacity 0.15s;
+}
+a.back:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+
+@media (max-width: 480px) {
+  #logo-link { top: 0.3cm; left: 0.3cm; }
+  #site-logo { height: 1.5cm; }
+}
+
+
+/* Faixa verde lateral */
+html::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5cm;
+  background: #0e8028;
+  z-index: 899;
+}
+
+/* Sidebar ao lado da faixa verde */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  padding: 4cm 12px 16px 12px;
+  z-index: 1002;
+  overflow: auto;
+}
+/* Botão Sair */
+.btn-sair {
+  position: fixed;
+  top: 0.5cm;
+  right: 0.5cm;
+  background: #fff;
+  border: none;
+  color: #28a745;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s, background 0.15s;
+}
+.btn-sair:hover {
+  opacity: 0.85;
+  background: #f0f0f0;
+}
+.btn-sair svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Avatar do usuário */
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  color: #28a745;
+  border: 2px solid #28a745;
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+  text-transform: uppercase;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: block;
+}
+.sidebar nav ul li {
+  margin: 6px 0;
+}
+.sidebar nav ul li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.sidebar nav ul li a:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+.sidebar nav ul li a.active {
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+.sidebar nav ul li a svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+body {
+  padding-left: calc(200px + 24px);
+  padding-top: 3.5cm;
+}
+
+/* Tabelas mais limpas */
+table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+th {
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+td, th {
+  padding: 10px 12px;
+}
+
+/* Cards do dashboard mais suaves */
+.card {
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+@media (max-width:640px){
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 12px;
+  }
+  body {
+    padding-left: 0;
+  }
+}

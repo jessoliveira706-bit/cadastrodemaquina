@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Usuários - Cadastro</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:16px auto;padding:0 16px;color:#222}
+    header{display:flex;align-items:center;gap:8px}
+    a.back{color:#0366d6;text-decoration:none;font-size:13px}
+    h1{font-size:16px;margin-bottom:4px}
+    .split{display:flex;gap:16px;margin-top:8px;min-height:200px}
+    .split > div{flex:1;border:1px solid #e0e0e0;border-radius:6px;padding:12px;display:flex;flex-direction:column}
+    .split > div:first-child{background:#fafafa}
+    form{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    label{display:block;font-size:12px}
+    input,textarea,select{width:100%;padding:4px 6px;border:1px solid #ccc;border-radius:3px;margin-top:2px;margin-bottom:2px;font-size:12px;box-sizing:border-box}
+    .full{grid-column:1 / -1}
+    .controls{display:flex;gap:6px;align-items:center;margin-top:4px}
+    button{padding:4px 10px;border:none;background:#0366d6;color:#fff;border-radius:3px;cursor:pointer;font-size:12px}
+    button.secondary{background:#6c757d}
+    .btn-list{display:flex;align-items:center;justify-content:center;height:100%;font-size:14px;padding:12px 24px;background:#0366d6;color:#fff;border:none;border-radius:6px;cursor:pointer;text-decoration:none;text-align:center}
+    .btn-list:hover{background:#0356b6}
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="utils.js"></script>
+</head>
+<body>
+  <a href="index.html" id="logo-link"><img id="site-logo" src="logo_secretaria_gecotec.png" alt="Logotipo"></a>
+  <button id="btnSair" class="btn-sair" title="Sair"><i data-lucide="log-out"></i></button>
+  <div class="sidebar">
+    <div class="user-avatar" id="userAvatar">U</div>
+    <nav>
+      <ul>
+        <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
+        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
+        <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
+        <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
+        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        </ul>
+    </nav>
+  </div>
+  <header>
+    <a class="back" href="index.html">← Voltar</a>
+    <h1>Cadastro de Usuários</h1>
+  </header>
+  <p class="muted">Cadastre usuários do sistema.</p>
+
+  <div class="split">
+    <div>
+      <form id="userForm">
+        <input type="hidden" id="idx" />
+
+        <div>
+          <label>Nome completo</label>
+          <input id="name" required />
+        </div>
+
+        <div>
+          <label>E-mail</label>
+          <input id="email" type="email" />
+        </div>
+
+        <div class="full">
+          <label>Departamento</label>
+          <select id="dept"></select>
+        </div>
+
+         <div class="full">
+          <label>secretaria</label>
+          <select id="dept"></select>
+        </div>
+
+        <div class="full">
+          <label>Observação</label>
+          <textarea id="obs" rows="2"></textarea>
+        </div>
+
+        <div class="full controls">
+          <button type="submit">Salvar</button>
+          <button type="button" class="secondary" id="clearBtn">Limpar</button>
+        </div>
+      </form>
+    </div>
+    <div>
+      <a href="usuarios-list.html" class="btn-list">Usuários Cadastrados</a>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'usuarios_v1'
+    const form = document.getElementById('userForm')
+    const deptSelect = document.getElementById('dept')
+
+    function load(){
+      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }catch(e){return[]}
+    }
+    function save(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)) }
+
+    function loadDepts(){
+      const depts = JSON.parse(localStorage.getItem('departments_v1') || '[]')
+      deptSelect.innerHTML = '<option value="">-- selecione --</option>'
+      depts.forEach(d => {
+        const o = document.createElement('option')
+        o.value = d.code
+        o.textContent = d.name + (d.code ? ' (' + d.code + ')' : '')
+        deptSelect.appendChild(o)
+      })
+    }
+
+    form.addEventListener('submit', e=>{
+      e.preventDefault()
+      const idx = document.getElementById('idx').value
+      const item = {
+        "name completo": document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        dept: document.getElementById('dept').value,
+        secretaria: document.getElementById('obs').value.trim()
+      }
+      if(!item["name completo"]){ alert('Informe o nome do usuário'); return }
+      const list = load()
+      if(idx==='') list.push(item); else list[Number(idx)] = item
+      save(list)
+      form.reset(); document.getElementById('idx').value = ''
+    })
+
+    document.getElementById('clearBtn').addEventListener('click', ()=>{ form.reset(); document.getElementById('idx').value = '' })
+
+    window.edit = function(i){
+      const list = load(); const u = list[i]; if(!u) return
+      document.getElementById('idx').value = i
+      document.getElementById('name').value = u["name completo"]
+      document.getElementById('email').value = u.email
+      document.getElementById('dept').value = u.dept
+      document.getElementById('secretaria').value = u.secretaria
+      window.scrollTo({top:0,behavior:'smooth'})
+    }
+
+    loadDepts()
+
+    const editIdx = sessionStorage.getItem('editUserIdx')
+    if(editIdx !== null){
+      sessionStorage.removeItem('editUserIdx')
+      window.edit(Number(editIdx))
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons()
+  </script>
+</body>
+</html>

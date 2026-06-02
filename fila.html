@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fila de Chamados</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:960px;margin:8px auto;padding:0 12px;color:#222}
+    header{display:flex;align-items:center;gap:4px}
+    .controls{display:flex;gap:4px;align-items:center;margin-bottom:4px}
+    input,select,textarea{padding:2px 4px;border:1px solid #ccc;border-radius:2px;font-size:11px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
+    section{background:rgba(0,0,0,0.03);padding:4px;border-radius:3px;display:flex;flex-direction:column;align-items:center}
+    h2{font-size:12px;margin:0 0 2px;text-align:center;width:100%}
+    table{width:100%;border-collapse:collapse;margin:2px 0}
+    th,td{border:1px solid #e6e6e6;padding:2px 4px;font-size:11px;text-align:center;vertical-align:middle}
+    th{background:#f6f8fa}
+    button{padding:2px 6px;border:none;background:#0366d6;color:#fff;border-radius:2px;cursor:pointer;font-size:11px}
+    button.danger{background:#d9534f}
+    #tbl-aguardando thead th{background:#0d6efd;color:#fff}
+    #tbl-aguardando tbody tr td{border-color:#a9d1ff}
+    #tbl-manutencao thead th{background:#dc3545;color:#fff}
+    #tbl-manutencao tbody tr td{border-color:#f5b7b7}
+    #tbl-entregue thead th{background:#28a745;color:#fff}
+    #tbl-entregue tbody tr td{border-color:#c9f0d0}
+    #tbl-aguardando{--tint:#0d6efd}
+    #tbl-manutencao{--tint:#dc3545}
+    #tbl-entregue{--tint:#28a745}
+    #tbl-aguardando thead th, #tbl-manutencao thead th, #tbl-entregue thead th{font-weight:600}
+    #callForm{display:none;margin-bottom:10px}
+    #callForm.open{display:block}
+    #btn-abrir{margin-bottom:8px;font-size:12px}
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="utils.js"></script>
+</head>
+<body>
+  <a href="index.html" id="logo-link"><img id="site-logo" src="logo_secretaria_gecotec.png" alt="Logotipo"></a>
+  <button id="btnSair" class="btn-sair" title="Sair"><i data-lucide="log-out"></i></button>
+  <div class="sidebar">
+    <div class="user-avatar" id="userAvatar">U</div>
+    <nav>
+      <ul>
+        <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
+        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
+        <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
+        <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
+        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        </ul>
+    </nav>
+  </div>
+
+
+  <header>
+    <a class="back" href="index.html">← Voltar</a>
+    <h1>Fila de Chamados</h1>
+  </header>
+
+
+  <p class="muted">Adicione chamados de máquinas e altere o status entre Aguardando, Em manutenção e Entregue.</p>
+
+
+  <button type="button" id="btn-abrir" onclick="location.href='chamado.html'">+ Abrir Chamado</button>
+
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+    <section>
+      <h2>Aguardando</h2>
+      <table id="tbl-aguardando"><thead><tr><th>#</th><th>Máquina</th><th>Depto</th><th>Descrição</th><th>Ações</th></tr></thead><tbody></tbody></table>
+    </section>
+    <section>
+      <h2>Em manutenção</h2>
+      <table id="tbl-manutencao"><thead><tr><th>#</th><th>Máquina</th><th>Depto</th><th>Descrição</th><th>Ações</th></tr></thead><tbody></tbody></table>
+    </section>
+    <section>
+      <h2>Entregue</h2>
+      <table id="tbl-entregue"><thead><tr><th>#</th><th>Máquina</th><th>Depto</th><th>Descrição</th><th>Ações</th></tr></thead><tbody></tbody></table>
+    </section>
+  </div>
+
+
+  <script>
+    const KEY = 'calls_v1'
+    const tbodyA = document.querySelector('#tbl-aguardando tbody')
+    const tbodyM = document.querySelector('#tbl-manutencao tbody')
+    const tbodyE = document.querySelector('#tbl-entregue tbody')
+
+
+    function load(){ try{ return JSON.parse(localStorage.getItem(KEY) || '[]') }catch(e){return[]} }
+    function save(list){ localStorage.setItem(KEY, JSON.stringify(list)); render() }
+
+
+    function render(){
+      const list = load()
+      tbodyA.innerHTML = ''; tbodyM.innerHTML = ''; tbodyE.innerHTML = ''
+      list.forEach((c,i)=>{
+        const tr = document.createElement('tr')
+        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(c.machine)}</td><td>${escapeHtml(c.dept)}</td><td>${escapeHtml(c.desc)}</td><td></td>`
+        const actions = tr.querySelector('td:last-child')
+        const select = document.createElement('select')
+        ['Aguardando','Em manutenção','Entregue'].forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; if(s===c.status) o.selected=true; select.appendChild(o) })
+        select.addEventListener('change', ()=>{ c.status = select.value; const l = load(); l[i]=c; save(l) })
+        const editBtn = document.createElement('button'); editBtn.textContent='Editar'; editBtn.addEventListener('click', ()=>{ edit(i) })
+        const delBtn = document.createElement('button'); delBtn.textContent='Remover'; delBtn.className='danger'; delBtn.addEventListener('click', ()=>{ if(confirm('Remover chamado?')){ const l=load(); l.splice(i,1); save(l) } })
+        actions.appendChild(select); actions.appendChild(editBtn); actions.appendChild(delBtn)
+
+
+        if(c.status==='Aguardando') tbodyA.appendChild(tr)
+        else if(c.status==='Em manutenção') tbodyM.appendChild(tr)
+        else tbodyE.appendChild(tr)
+      })
+    }
+
+
+    window.edit = function(i){
+      sessionStorage.setItem('editCallIdx', i)
+      window.location.href = 'chamado.html'
+    }
+
+
+    render()
+    if (typeof lucide !== 'undefined') lucide.createIcons()
+  </script>
+</body>
+</html>

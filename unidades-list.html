@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Unidades - Listagem</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:16px auto;padding:0 16px;color:#222}
+    header{display:flex;align-items:center;gap:8px;justify-content:space-between}
+    header .left{display:flex;align-items:center;gap:8px}
+    a.back{color:#0366d6;text-decoration:none;font-size:13px}
+    h1{font-size:16px;margin-bottom:4px}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{border:1px solid #e6e6e6;padding:4px 6px;text-align:left;font-size:12px}
+    th{background:#f6f8fa}
+    button{padding:4px 10px;border:none;border-radius:3px;cursor:pointer;font-size:12px}
+    .btn-edit{background:#0366d6;color:#fff}
+    .btn-del{background:#d9534f;color:#fff}
+    .empty{text-align:center;color:#888;padding:24px;font-size:13px}
+
+    .dropdown{position:relative;display:inline-block}
+    .dropdown-btn{padding:6px 14px;background:#0366d6;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
+    .dropdown-btn:hover{background:#0356b6}
+    .dropdown-content{display:none;position:absolute;right:0;top:100%;background:#fff;min-width:220px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-radius:4px;z-index:10;margin-top:4px}
+    .dropdown-content a{display:block;padding:8px 12px;color:#222;text-decoration:none;font-size:13px}
+    .dropdown-content a:hover{background:#f0f0f0}
+    .dropdown.open .dropdown-content{display:block}
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="utils.js"></script>
+</head>
+<body>
+  <a href="index.html" id="logo-link"><img id="site-logo" src="logo_secretaria_gecotec.png" alt="Logotipo"></a>
+  <button id="btnSair" class="btn-sair" title="Sair"><i data-lucide="log-out"></i></button>
+  <div class="sidebar">
+    <div class="user-avatar" id="userAvatar">U</div>
+    <nav>
+      <ul>
+        <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
+        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
+        <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
+        <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
+        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        </ul>
+    </nav>
+  </div>
+  <header>
+    <div class="left">
+      <a class="back" href="index.html">← Voltar</a>
+      <h1>Unidades</h1>
+    </div>
+    <div class="dropdown" id="unitDropdown">
+      <button class="dropdown-btn" id="dropdownToggle">
+        <i data-lucide="plus" style="width:14px;height:14px"></i> Cadastro <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
+      </button>
+      <div class="dropdown-content">
+        <a href="unidades.html"><i data-lucide="file-plus" style="width:14px;height:14px;margin-right:6px"></i> Cadastro de Unidades</a>
+      </div>
+    </div>
+  </header>
+
+  <table id="unitTable">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Endereço</th>
+        <th>CEP</th>
+        <th>Telefone</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const STORAGE_KEY = 'units_list_v1'
+    const tbody = document.querySelector('#unitTable tbody')
+
+    function load(){
+      try{
+        const v = JSON.parse(localStorage.getItem(STORAGE_KEY))
+        if(!Array.isArray(v) || v.length===0) return []
+        if(typeof v[0] === 'string') return v.map(n=>({ name: n, address: '', cep: '', phone: '' }))
+        return v.map(u=>({ name: u.name||'', address: u.address||'', cep: u.cep||'', phone: u.phone||'' }))
+      }catch(e){ return [] }
+    }
+    function save(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); render() }
+
+    function render(){
+      const list = load(); tbody.innerHTML = ''
+      if(list.length === 0){
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhuma unidade cadastrada.</td></tr>'
+        return
+      }
+      list.forEach((u,i)=>{
+        const tr = document.createElement('tr')
+        tr.innerHTML = `
+          <td>${escapeHtml(u.name)}</td>
+          <td>${escapeHtml(u.address)}</td>
+          <td>${escapeHtml(u.cep)}</td>
+          <td>${escapeHtml(u.phone)}</td>
+          <td>
+            <button class="btn-edit" onclick="edit(${i})">Editar</button>
+            <button class="btn-del" onclick="del(${i})">Remover</button>
+          </td>
+        `
+        tbody.appendChild(tr)
+      })
+    }
+
+    window.edit = function(i){
+      sessionStorage.setItem('editUnitIdx', i)
+      window.location.href = 'unidades.html'
+    }
+
+    window.del = function(i){
+      if(!confirm('Remover esta unidade?')) return
+      const list = load(); list.splice(i,1); save(list)
+    }
+
+    document.getElementById('dropdownToggle').addEventListener('click', function(e){
+      e.stopPropagation()
+      document.getElementById('unitDropdown').classList.toggle('open')
+    })
+    document.addEventListener('click', function(){
+      document.getElementById('unitDropdown').classList.remove('open')
+    })
+    render()
+    if (typeof lucide !== 'undefined') lucide.createIcons()
+  </script>
+</body>
+</html>
