@@ -5,28 +5,76 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Cadastro - Início</title>
     <style>
-        body{font-family:Arial,Helvetica,sans-serif;max-width:960px;margin:48px auto;padding:0 16px;color:#222}
-        h1{font-size:22px;margin-bottom:8px;text-align:center}
-        p{color:#5c6981;text-align:center}
-        .cards{display:flex;gap:12px;margin-top:24px;justify-content:center}
-        .card{flex:1;padding:20px;border:1px solid #020202;border-radius:8px;text-align:center;background:#e7e5e5;max-width:340px}
-        .card a{display:inline-block;margin-top:12px;padding:10px 14px;background:#0366d6;color:#ebe8e8;border-radius:6px;text-decoration:none}
-        .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin:28px 0 10px}
-        .stats{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;justify-content:center}
-        .stat-card{flex:1 1 140px;max-width:200px;padding:16px 12px;border-radius:10px;text-align:center;border:1px solid rgba(0,0,0,.07)}
-        .stat-card .s-label{font-size:12px;color:#666;margin-bottom:6px}
-        .stat-card .s-count{font-size:30px;font-weight:800;line-height:1}
-        .stat-card.blue{background:rgba(3,102,214,.08)}.stat-card.blue .s-count{color:#0366d6}
-        .stat-card.indigo{background:rgba(13,110,253,.08)}.stat-card.indigo .s-count{color:#0d6efd}
-        .stat-card.green{background:rgba(40,167,69,.08)}.stat-card.green .s-count{color:#28a745}
-        .stat-card.red{background:rgba(220,53,69,.08)}.stat-card.red .s-count{color:#dc3545}
-        .stat-card.orange{background:rgba(253,126,20,.08)}.stat-card.orange .s-count{color:#fd7e14}
-        .stat-card.gray{background:rgba(108,117,125,.08)}.stat-card.gray .s-count{color:#6c757d}
-        .stat-card.teal{background:rgba(32,201,151,.08)}.stat-card.teal .s-count{color:#20c997}
-        .stat-card.purple{background:rgba(111,66,193,.08)}.stat-card.purple .s-count{color:#6f42c1}
+        * { box-sizing: border-box; }
+        body { max-width: 1000px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+        h1 { font-size: 1.5rem; font-weight: 800; margin: 0 0 4px; color: #1e293b; text-align: center; }
+        h1 svg { color: #188331; }
+        p.sub { color: #64748b; font-size: 0.9rem; text-align: center; margin: 0 0 24px; }
+
+        .section-title {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.06em; color: #94a3b8; margin: 28px 0 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-title svg { width: 16px; height: 16px; color: #188331; }
+
+        .cards { display: flex; gap: 12px; margin-top: 20px; justify-content: center; }
+        .card {
+            flex: 1; max-width: 340px; padding: 24px 20px;
+            background: #fff; border-radius: 16px; text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .card .card-icon { width: 36px; height: 36px; color: #188331; margin-bottom: 8px; }
+        .card h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 4px; color: #1e293b; }
+        .card p { font-size: 0.8rem; color: #64748b; margin: 0 0 14px; }
+        .card a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 9px 18px; background: #188331; color: #fff;
+            border-radius: 10px; text-decoration: none;
+            font-size: 0.82rem; font-weight: 600; transition: all 0.2s;
+        }
+        .card a:hover { background: #146a28; }
+
+        .charts-row { display: flex; gap: 20px; margin-bottom: 28px; }
+        .chart-card {
+            flex: 1; background: #fff; border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0; padding: 20px;
+        }
+        .chart-card h3 {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.04em; color: #64748b; margin: 0 0 12px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .chart-card h3 svg { width: 16px; height: 16px; color: #188331; }
+        .chart-card canvas { max-height: 220px; max-width: 100%; }
+        @media (max-width: 700px) { .charts-row { flex-direction: column; } }
+
+        .table-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+        .list-row {
+            display: flex; gap: 16px; align-items: center;
+            padding: 12px 16px; font-size: 0.85rem; color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .list-row:last-child { border-bottom: none; }
+        .list-row:hover { background: #f8fafc; }
+        .list-row .num { font-weight: 600; color: #94a3b8; min-width: 28px; }
+        .list-row .field { flex: 1; }
+        .list-row .field.main { font-weight: 500; }
     </style>
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
     <script src="utils.js"></script>
 </head>
 <body>
@@ -46,76 +94,116 @@
             </nav>
         </div>
 
-    <h1>Sistema de Cadastro de máquinas alocadas</h1>
-    <p>Bem-vindo ao sistema de cadastro de máquinas</p>
+    <h1><i data-lucide="monitor"></i> Sistema de Cadastro de Máquinas</h1>
+    <p class="sub">Bem-vindo ao sistema de cadastro de máquinas alocadas</p>
 
-    <!-- Chamados - lista unificada -->
-    <div class="section-title">Chamados</div>
-    <table style="width:100%;border-collapse:collapse;margin-top:8px">
-      <thead>
-        <tr>
-          <th style="border:1px solid #ccc;padding:8px;font-size:13px;background:#222;color:#fff">Nº do Chamado</th>
-          <th style="border:1px solid #ccc;padding:8px;font-size:13px;background:#222;color:#fff">Máquina</th>
-          <th style="border:1px solid #ccc;padding:8px;font-size:13px;background:#222;color:#fff">Departamento</th>
-          <th style="border:1px solid #ccc;padding:8px;font-size:13px;background:#222;color:#fff">Status</th>
-        </tr>
-      </thead>
-      <tbody id="kanban-body"></tbody>
-    </table>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3><i data-lucide="pie-chart"></i> Chamados por Status</h3>
+        <canvas id="chart-calls"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3><i data-lucide="bar-chart-3"></i> Máquinas por Status</h3>
+        <canvas id="chart-machines"></canvas>
+      </div>
+    </div>
+
+    <div class="table-card" id="kanban-list" style="display:none"></div>
 
 </body>
 <script>
-    function set(id, val){ document.getElementById(id).textContent = val }
+    function escapeHtml(t){const d=document.createElement('div');d.appendChild(document.createTextNode(t));return d.innerHTML}
 
+    let chartCalls = null, chartMachines = null
 
-    function updateAll(){
-        try{
-            const calls = JSON.parse(localStorage.getItem('calls_v1') || '[]')
-            set('count-open',       calls.filter(c=>c.status!=='Entregue').length)
-            set('count-awaiting',   calls.filter(c=>c.status==='Aguardando').length)
-            set('count-maintenance',calls.filter(c=>c.status==='Em manutenção').length)
-            set('count-delivered',  calls.filter(c=>c.status==='Entregue').length)
-        }catch(e){}
+    function updateCharts(){
+      const calls = JSON.parse(localStorage.getItem('calls_v1') || '[]')
+      const machines = JSON.parse(localStorage.getItem('machines_alocadas_v1') || '[]')
 
+      const callStatus = {
+        Aguardando: calls.filter(c=>c.status==='Aguardando').length,
+        'Em manutenção': calls.filter(c=>c.status==='Em manutenção').length,
+        Entregue: calls.filter(c=>c.status==='Entregue').length,
+      }
 
-        try{
-            const machines = JSON.parse(localStorage.getItem('machines_alocadas_v1') || '[]')
-            set('count-machines-total',     machines.length)
-            set('count-machines-alocada',   machines.filter(m=>m.status==='Alocada').length)
-            set('count-machines-disponivel',machines.filter(m=>m.status==='Disponível').length)
-            set('count-machines-manutencao',machines.filter(m=>m.status==='Manutenção').length)
-            set('count-machines-devolucao', machines.filter(m=>m.status==='Devolução').length)
-        }catch(e){}
+      const machineStatus = {
+        Alocada: machines.filter(m=>m.status==='Alocada').length,
+        Disponível: machines.filter(m=>m.status==='Disponível').length,
+        Manutenção: machines.filter(m=>m.status==='Manutenção').length,
+        Devolução: machines.filter(m=>m.status==='Devolução').length,
+      }
 
+      const colors = ['#3b82f6','#ef4444','#22c55e']
+      const colorsM = ['#6366f1','#14b8a6','#f97316','#a855f7']
 
-        try{
-            const depts = JSON.parse(localStorage.getItem('departments_v1') || '[]')
-            set('count-departments', depts.length)
-        }catch(e){}
+      if(chartCalls) chartCalls.destroy()
+      if(chartMachines) chartMachines.destroy()
 
+      const ctx1 = document.getElementById('chart-calls')
+      if(ctx1){
+        chartCalls = new Chart(ctx1, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(callStatus),
+            datasets: [{
+              data: Object.values(callStatus),
+              backgroundColor: colors,
+              borderWidth: 0,
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: true,
+            plugins: {
+              legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, font: { size: 11, family: 'Inter' } } }
+            }
+          }
+        })
+      }
 
-        try{
-            const units = JSON.parse(localStorage.getItem('units_list_v1') || '[]')
-            set('count-units', units.length)
-        }catch(e){}
+      const ctx2 = document.getElementById('chart-machines')
+      if(ctx2){
+        chartMachines = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(machineStatus),
+            datasets: [{
+              data: Object.values(machineStatus),
+              backgroundColor: colorsM,
+              borderRadius: 6,
+              borderSkipped: false,
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: true,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11, family: 'Inter' } }, grid: { color: '#f1f5f9' } },
+              x: { ticks: { font: { size: 10, family: 'Inter' } } }
+            }
+          }
+        })
+      }
     }
-
 
     function renderKanban(){
       const calls = JSON.parse(localStorage.getItem('calls_v1') || '[]')
-      const tbody = document.getElementById('kanban-body')
-      if(!tbody) return
-      tbody.innerHTML = ''
-      calls.forEach((c, i) => {
-        const tr = document.createElement('tr')
-        tr.innerHTML = `<td style="border:1px solid #ccc;padding:8px;font-size:13px">${i+1}</td><td style="border:1px solid #ccc;padding:8px;font-size:13px">${escapeHtml(c.machine)}</td><td style="border:1px solid #ccc;padding:8px;font-size:13px">${escapeHtml(c.dept)}</td><td style="border:1px solid #ccc;padding:8px;font-size:13px">${escapeHtml(c.status)}</td>`
-        tbody.appendChild(tr)
-      })
+      const container = document.getElementById('kanban-list')
+      if(!container) return
+      if(calls.length){
+        container.style.display = ''
+        container.innerHTML = calls.map((c, i) =>
+          `<div class="list-row"><span class="num">${i+1}</span><span class="field main">${escapeHtml(c.machine)}</span><span class="field">${escapeHtml(c.dept)}</span><span class="field">${escapeHtml(c.status)}</span></div>`
+        ).join('')
+      } else {
+        container.style.display = 'none'
+      }
     }
 
-    updateAll()
+    updateCharts()
     renderKanban()
-    window.addEventListener('storage', updateAll)
+    window.addEventListener('storage', ()=>{ updateCharts(); renderKanban() })
     if (typeof lucide !== 'undefined') lucide.createIcons()
 </script>
 </html>

@@ -3,17 +3,69 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Unidades - Seleção</title>
+  <title>Unidades - Cadastro</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#222}
-    header{display:flex;align-items:center;gap:12px}
-    a.back{color:#0366d6;text-decoration:none}
-    h1{font-size:20px;margin-bottom:8px}
-    label{display:block;font-size:13px;margin-bottom:6px}
-    select{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px}
-    .controls{display:flex;gap:8px;align-items:center;margin-top:12px}
-    button{padding:8px 12px;border:none;background:#0366d6;color:#fff;border-radius:4px;cursor:pointer}
-    button.secondary{background:#6c757d}
+    * { box-sizing: border-box; }
+    body { max-width: 680px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
+    a.back:hover { opacity: 1; text-decoration: underline; }
+    h1 { font-size: 1.35rem; font-weight: 700; margin: 0; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    h1 svg { color: #188331; }
+    p.muted { color: #64748b; font-size: 0.85rem; margin: -16px 0 20px; }
+
+    .form-card {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      padding: 28px 28px 20px; margin-bottom: 32px; border: 1px solid #f0f0f0;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .form-group label {
+      font-size: 0.75rem; font-weight: 600; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-group label svg { width: 14px; height: 14px; color: #188331; flex-shrink: 0; }
+    .form-group select, .form-group input {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 0.9rem; font-family: inherit; color: #1e293b;
+      background: #f8fafc; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .form-group select:focus, .form-group input:focus {
+      border-color: #188331;
+      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
+      background: #fff;
+    }
+
+    .fields-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px;
+      margin-top: 4px;
+    }
+    .fields-grid .full { grid-column: 1 / -1; }
+
+    .controls {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      margin-top: 4px; padding-top: 16px; border-top: 1.5px solid #e2e8f0;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border: none; border-radius: 10px;
+      font-size: 0.82rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn svg { width: 16px; height: 16px; }
+    .btn-primary { background: #188331; color: #fff; }
+    .btn-primary:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; transform: translateY(-1px); }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
+    .btn-danger:hover { background: #fecaca; transform: translateY(-1px); }
+    .btn-success { background: #059669; color: #fff; }
+    .btn-success:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,150,105,0.25); }
+    .btn:active { transform: scale(0.97); }
   </style>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -37,187 +89,113 @@
   </div>
   <header>
     <a class="back" href="index.html">← Voltar</a>
-    <h1>Selecione uma Unidade</h1>
+    <h1><i data-lucide="building"></i> Cadastro de Unidade</h1>
   </header>
 
+  <p class="muted">Cadastre ou edite uma unidade.</p>
 
-  <p class="muted">Escolha uma das unidades abaixo.</p>
-
-
-  <div>
-    <label for="unitSelect">Unidade</label>
-    <select id="unitSelect">
-      <option value="">-- selecione --</option>
-    </select>
-    <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <input id="newUnit" placeholder="Nome da unidade" style="padding:8px;border:1px solid #ccc;border-radius:4px" />
-      <input id="unitCep" placeholder="CEP" style="padding:8px;border:1px solid #ccc;border-radius:4px" />
-      <input id="unitAddress" placeholder="Endereço" style="grid-column:1/3;padding:8px;border:1px solid #ccc;border-radius:4px" />
-      <input id="unitPhone" placeholder="Telefone" style="padding:8px;border:1px solid #ccc;border-radius:4px" />
-      <div style="display:flex;gap:8px">
-        <button type="button" id="addUnitBtn">Adicionar</button>
-        <button type="button" id="deleteUnitBtn" style="background:#d9534f">Excluir</button>
+  <div class="form-card">
+      <div class="form-group">
+        <label><i data-lucide="building-2"></i> Unidade</label>
+        <input id="unitSelect" type="text" placeholder="Digite o nome da unidade" />
       </div>
+
+    <div class="fields-grid">
+      <div class="form-group" style="margin:0">
+        <label><i data-lucide="file-text"></i> Nome</label>
+        <input id="newUnit" placeholder="Nome da unidade" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <label><i data-lucide="mail"></i> CEP</label>
+        <input id="unitCep" placeholder="CEP" maxlength="8" />
+      </div>
+      <div class="form-group full" style="margin:0">
+        <label><i data-lucide="map-pin"></i> Endereço</label>
+        <input id="unitAddress" placeholder="Endereço completo" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <label><i data-lucide="phone"></i> Telefone</label>
+        <input id="unitPhone" placeholder="Telefone" />
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="saveBtn"><i data-lucide="save"></i> Salvar unidade</button>
+      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="trash-2"></i> Limpar</button>
     </div>
   </div>
 
 
-  <div class="controls">
-    <button id="saveBtn">Salvar unidade</button>
-    <button type="button" class="secondary" id="clearBtn">Limpar</button>
-  </div>
-
-
   <script>
-    const sel = document.getElementById('unitSelect')
+    const unitInput = document.getElementById('unitSelect')
     const saveBtn = document.getElementById('saveBtn')
     const clearBtn = document.getElementById('clearBtn')
-    const newUnitInput = document.getElementById('newUnit')
-    const addUnitBtn = document.getElementById('addUnitBtn')
-    const deleteUnitBtn = document.getElementById('deleteUnitBtn')
-
+    const editNameInput = document.getElementById('newUnit')
 
     const UNITS_KEY = 'units_list_v1'
     const SELECTED_KEY = 'selected_unit'
 
-
-    const DEFAULT_UNITS = [
-      "ARQUIVO MUNICIPAL","BOM PRATO","CARTÓRIO ELEITORAL","CASA AFRO","CRAS BELÉM ESTAÇÃO","CRAS VASSOURAS","CRAS SANTO ANTÔNIO","CIC","Conselho tutelar I","Conselho tutelar II","CULTURA","DELEGACIA DA MULHER","EM ALAIN DOS SANTOS GOMES","EM ALFREDO VOLPI","EM ALMEIDA JUNIOR","EM AMADO PINTO DE SANTANA","EM ANISIO SPINDOLA","EM ANITA MALFATI","EM ANTONIO FEDERZONI","EM ANTONIO MUNIZ","EM ANTONIO PACHECO DO NASCIMENTO","EM BRIGADEIRO ROBERTO BRANDINI","EM CANDIDO PORTINARI","EM CARLOS DRUMOND DE ANDRADE","EM CASTRO ALVES","EM CLARICE LINSPECTOR","EM CORA CORALINA","EM DR FRANCISCO MORATO","EM EDITE PEREIRA DE ARRUDA","EM EGON SCHADEN","EM ELBA NOBREGA SOBRAL","EM ERICO VERISSIMO","EM FANNY GOLDBERG","EM FERNANDO PESSOA","EM GRACILIANO RAMOS","EM HEITOR HARTMANN","EM HOSUE MORITA AOKI","EM ISABEL LUPIANHES ROMERA RYAN","EM JORGE TERTULIANO RIZZI","EM JOSE BEZERRA SANCHES","EM LAIRCE LUPIANHES","EM LEONARDO DA VINCI","EM LIMA BARRETO","EM MACHADO DE ASSIS","EM MARCO AURELIO MAGOGA","EM MONTEIRO LOBATO","EM OLAVO BILAC","EM ORDÁRIO DE SOUZA MARTINS","EM PADRE LUIS SERGIO PACHECO DO NASCIMENTO","EM PAULO FREIRE","EM RADIALISTA JAIME GONCALVES","EM RUTH ROCHA","EM SONIA REGINA FRANCISCO DE OLIVEIRA","EM TANIA FERNANDES","EM TARSILA DO AMARAL","EM ULISSES SILVEIRA GUIMARAES","EM VANDA TEREZINHA NALIN","EM VEREADOR PASTOR JORGE GABRIEL RODRIGUES","EM VINICIUS DE MORAES","EM ZELIA GATAI","ESPORTES","FUNDO SOCIAL DE SOLIDARIEDADE","FUSBEMO","GUARDA CIVIL MUNICIPAL","MERENDA ESCOLAR","PAÇO MUNICIPAL","QUADRA DE ESPORTES","SEGURANÇA CIDADÃ"
-    ]
-    // converter para objetos com campos extras
-    const DEFAULT_UNITS_OBJ = DEFAULT_UNITS.map(n=>({ name: n, address: '', cep: '', phone: '' }))
-
-
     function loadUnits(){
       try{
         const v = JSON.parse(localStorage.getItem(UNITS_KEY))
-        if(!Array.isArray(v) || v.length===0) return DEFAULT_UNITS_OBJ.slice()
-        // compat: array of strings -> convert to objects
+        if(!Array.isArray(v) || v.length===0) return []
         if(typeof v[0] === 'string') return v.map(n=>({ name: n, address: '', cep: '', phone: '' }))
-        // if already objects, ensure fields exist
         return v.map(u=>({ name: u.name||'', address: u.address||'', cep: u.cep||'', phone: u.phone||'' }))
-      }catch(e){ return DEFAULT_UNITS_OBJ.slice() }
+      }catch(e){ return [] }
     }
     function saveUnits(list){ localStorage.setItem(UNITS_KEY, JSON.stringify(list)) }
 
-
-    function populate(){
+    function syncInputs(){
+      const v = unitInput.value.trim()
+      if(!v) return
       const list = loadUnits()
-      sel.innerHTML = ''
-      const ph = document.createElement('option'); ph.value = ''; ph.textContent = '-- selecione --'; sel.appendChild(ph)
-      list.forEach(u=>{
-        const o = document.createElement('option'); o.value = u.name; o.textContent = u.name; sel.appendChild(o)
-      })
-      try{ const s = localStorage.getItem(SELECTED_KEY); if(s) sel.value = s }catch(e){}
-    }
-
-
-    addUnitBtn.addEventListener('click', ()=>{
-      const name = newUnitInput.value.trim()
-      const cep = document.getElementById('unitCep').value.trim()
-      const address = document.getElementById('unitAddress').value.trim()
-      const phone = document.getElementById('unitPhone').value.trim()
-      if(!name){ alert('Digite o nome da unidade'); return }
-      const list = loadUnits()
-      // Se o botão estiver em modo 'Atualizar', altera o item selecionado
-      if(addUnitBtn.dataset.mode === 'update'){
-        const old = sel.dataset.orig || sel.value
-        if(!old){ alert('Selecione a unidade correta'); return }
-        // evita duplicata ao renomear
-        if(list.find(u=>u.name.toLowerCase()===name.toLowerCase() && u.name!==old)){ alert('Já existe uma unidade com esse nome'); return }
-        const idx = list.findIndex(x=>x.name===old)
-        if(idx===-1){ alert('Unidade original não encontrada'); return }
-        list[idx] = { name, address, cep, phone }
-        saveUnits(list)
-        populate()
-        sel.value = name
-        resetAddMode()
-        return
-      }
-
-
-      if(list.find(u=>u.name.toLowerCase()===name.toLowerCase())){ alert('Unidade já existe'); return }
-      list.push({ name, address, cep, phone })
-      saveUnits(list)
-      populate()
-      sel.value = name
-      newUnitInput.value = ''
-      document.getElementById('unitCep').value = ''
-      document.getElementById('unitAddress').value = ''
-      document.getElementById('unitPhone').value = ''
-      newUnitInput.focus()
-    })
-
-
-    deleteUnitBtn.addEventListener('click', ()=>{
-      const v = sel.value
-      if(!v){ alert('Selecione uma unidade para excluir'); return }
-      if(!confirm('Excluir unidade: ' + v + '?')) return
-      let list = loadUnits()
-      list = list.filter(u=>u.name!==v)
-      saveUnits(list)
-      localStorage.removeItem(SELECTED_KEY)
-      populate()
-    })
-
-
-    // Ao selecionar, habilita edição: preenche input e alterna botão para Atualizar
-    sel.addEventListener('change', ()=>{
-      const v = sel.value
-      if(v){
-        const list = loadUnits()
-        const obj = list.find(u=>u.name===v) || { name: v, address: '', cep: '', phone: '' }
-        newUnitInput.value = obj.name
+      const obj = list.find(u=>u.name.toLowerCase()===v.toLowerCase())
+      if(obj){
+        editNameInput.value = obj.name
         document.getElementById('unitCep').value = obj.cep
         document.getElementById('unitAddress').value = obj.address
         document.getElementById('unitPhone').value = obj.phone
-        addUnitBtn.textContent = 'Atualizar'
-        addUnitBtn.dataset.mode = 'update'
-        sel.dataset.orig = v
-        deleteUnitBtn.style.display = 'inline-block'
-      }else{
-        resetAddMode()
+      } else {
+        editNameInput.value = v
       }
+    }
+
+    unitInput.addEventListener('input', syncInputs)
+
+    saveBtn.addEventListener('click', ()=>{
+      const name = unitInput.value.trim()
+      if(!name){ alert('Digite o nome da unidade'); return }
+      const cep = document.getElementById('unitCep').value.trim()
+      const address = document.getElementById('unitAddress').value.trim()
+      const phone = document.getElementById('unitPhone').value.trim()
+      const list = loadUnits()
+
+      const idx = list.findIndex(u=>u.name.toLowerCase()===name.toLowerCase())
+      const obj = { name, address, cep, phone }
+      if(idx!==-1) list[idx] = obj
+      else list.push(obj)
+      saveUnits(list)
+      localStorage.setItem(SELECTED_KEY, name)
+      alert('Unidade salva: ' + name)
     })
 
-
-    function resetAddMode(){
-      newUnitInput.value = ''
+    clearBtn.addEventListener('click', ()=>{
+      unitInput.value = ''
       document.getElementById('unitCep').value = ''
       document.getElementById('unitAddress').value = ''
       document.getElementById('unitPhone').value = ''
-      addUnitBtn.textContent = 'Adicionar'
-      addUnitBtn.dataset.mode = 'add'
-      deleteUnitBtn.style.display = 'none'
-      delete sel.dataset.orig
-    }
-
-
-    saveBtn.addEventListener('click', ()=>{
-      const v = sel.value
-      if(!v){ alert('Selecione uma unidade'); return }
-      localStorage.setItem(SELECTED_KEY, v)
-      alert('Unidade salva: ' + v)
+      editNameInput.value = ''
+      localStorage.removeItem(SELECTED_KEY)
     })
 
-
-    clearBtn.addEventListener('click', ()=>{ sel.value = ''; localStorage.removeItem(SELECTED_KEY) })
-
-
-    populate()
-    // iniciar estado do botão de excluir oculto quando sem seleção
-    deleteUnitBtn.style.display = 'none'
-
-    // carregar edição vindo da lista
     const editIdx = sessionStorage.getItem('editUnitIdx')
     if(editIdx !== null){
       sessionStorage.removeItem('editUnitIdx')
       const list = loadUnits()
       const u = list[Number(editIdx)]
       if(u){
-        // preenche o select e dispara change para editar
-        sel.value = u.name
-        sel.dispatchEvent(new Event('change'))
+        unitInput.value = u.name
+        syncInputs()
         window.scrollTo({top:0,behavior:'smooth'})
       }
     }

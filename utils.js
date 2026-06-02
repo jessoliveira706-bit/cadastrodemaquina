@@ -33,7 +33,7 @@ function setupSair() {
     if (confirm('Deseja realmente sair?')) {
       localStorage.removeItem('user_initials');
       localStorage.removeItem('selected_unit');
-      window.location.href = 'index.html';
+      window.location.href = 'login.html';
     }
   });
 }

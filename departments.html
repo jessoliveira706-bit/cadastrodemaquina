@@ -5,33 +5,118 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Departamentos - Cadastro</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#222}
-    header{display:flex;align-items:center;gap:12px}
-    a.back{color:#0366d6;text-decoration:none}
-    h1{font-size:20px;margin-bottom:8px}
-    form{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:12px}
-    label{display:block;font-size:13px}
-    form > div{margin-bottom:8px}
-    input,textarea,select{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;margin-top:6px;margin-bottom:6px}
-    fieldset.address-group{grid-column:1 / -1;padding:12px;border:1px solid #e0e0e0;border-radius:6px;margin:0}
-    fieldset.address-group legend{font-weight:700;padding:0 6px}
-    fieldset.address-group > div{margin-bottom:6px}
-      /* Layout Rua + Número na mesma linha; Número retangular e menor */
-      input#location_street{flex:0 0 180px;min-width:120px;max-width:260px;padding:8px;border:1px solid #ccc;border-radius:4px}
-      input#location_number{width:80px;flex:0 0 80px;height:34px;padding:6px;border:1px solid #ccc;border-radius:2px}
-      /* Bairro ocupa linha própria e preenche o restante */
-      input#location_neighborhood{width:100%;max-width:100%}
-    /* Matricula menor e deslocada levemente para a direita */
-    input#matricula{width:90px;padding:6px;border:1px solid #ccc;border-radius:4px;margin-left:12px}
-    /* Bairro ocupa linha própria e preenche o restante */
-    input#location_neighborhood{width:100%;max-width:100%}
-    .full{grid-column:1 / -1}
-    .controls{display:flex;gap:8px;align-items:center}
-    button{padding:8px 12px;border:none;background:#0366d6;color:#fff;border-radius:4px;cursor:pointer}
-    button.secondary{background:#6c757d}
-    table{width:100%;border-collapse:collapse;margin-top:12px}
-    th,td{border:1px solid #e6e6e6;padding:8px;text-align:left;font-size:13px}
-    th{background:#f6f8fa}
+    * { box-sizing: border-box; }
+    body { max-width: 880px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
+    a.back:hover { opacity: 1; text-decoration: underline; }
+    h1 { font-size: 1.35rem; font-weight: 700; margin: 0; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    h1 svg { color: #188331; }
+    p.muted { color: #64748b; font-size: 0.85rem; margin: -16px 0 20px; }
+
+    .form-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      padding: 28px 28px 20px;
+      margin-bottom: 32px;
+      border: 1px solid #f0f0f0;
+    }
+
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+    .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label {
+      font-size: 0.75rem; font-weight: 600; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-group label svg { width: 14px; height: 14px; color: #188331; flex-shrink: 0; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 0.9rem; font-family: inherit; color: #1e293b;
+      background: #f8fafc; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #188331;
+      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
+      background: #fff;
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    input#matricula { max-width: 160px; }
+
+    fieldset.address-group {
+      grid-column: 1 / -1;
+      background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px;
+      padding: 20px 24px 12px; margin: 0;
+      display: grid; grid-template-columns: 1fr 120px 1fr; gap: 14px 20px;
+    }
+    fieldset.address-group legend {
+      grid-column: 1 / -1;
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: #188331; padding: 0;
+      display: flex; align-items: center; gap: 6px; margin-bottom: 2px;
+    }
+    fieldset.address-group legend svg { width: 15px; height: 15px; }
+    fieldset.address-group > div { margin: 0; }
+    fieldset.address-group label { font-size: 0.75rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    fieldset.address-group input {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0;
+      border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: #1e293b;
+      background: #fff; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    fieldset.address-group input:focus {
+      border-color: #188331;
+      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      margin-top: 6px; padding-top: 18px; border-top: 1.5px solid #e2e8f0;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border: none; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn svg { width: 17px; height: 17px; }
+    .btn-primary { background: #188331; color: #fff; }
+    .btn-primary:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; transform: translateY(-1px); }
+    .btn-success { background: #059669; color: #fff; }
+    .btn-success:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,150,105,0.25); }
+    .btn:active { transform: scale(0.97); }
+
+    .import-area {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; background: #f1f5f9; color: #475569;
+      border: 1.5px dashed #cbd5e1; transition: all 0.2s;
+      margin-left: auto;
+    }
+    .import-area:hover { background: #e2e8f0; border-color: #94a3b8; }
+    .import-area svg { width: 17px; height: 17px; }
+    input[type=file] { display: none; }
+
+    @media (max-width: 700px) {
+      form { grid-template-columns: 1fr; }
+      .full { grid-column: 1; }
+      fieldset.address-group { grid-template-columns: 1fr; }
+      fieldset.address-group legend { grid-column: 1; }
+      .controls { flex-direction: column; align-items: stretch; }
+      .import-area { margin-left: 0; }
+    }
   </style>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -60,19 +145,23 @@
   <p class="muted">Cadastre departamentos e gerencie responsáveis.</p>
 
 
+  <div class="form-card">
   <form id="deptForm">
     <input type="hidden" id="idx" />
 
-
-    <div>
-      <label>Patrimônio</label>
-      <input id="code" required />
+    <div class="form-group">
+      <label><i data-lucide="hash"></i> Código</label>
+      <input id="code" placeholder="Código do departamento" required />
     </div>
 
+    <div class="form-group">
+      <label><i data-lucide="building-2"></i> Nome do Departamento</label>
+      <input id="name" placeholder="Nome do departamento" />
+    </div>
 
-    <div>
-      <label>Unidade</label>
-      <select id="name">
+    <div class="form-group full">
+      <label><i data-lucide="folder"></i> Unidade</label>
+      <select id="unidade">
         <option value="">-- selecione --</option>
         <option>Departamentos da prefeitura</option>
         <option>Departamento de Tecnologia Interna/Informática</option>
@@ -303,52 +392,47 @@
       </select>
     </div>
 
-
-   
-    <div>
-      <label>Responsável Pelo Recebimento do Equipamento</label>
-      <input id="manager" />
+    <div class="form-group">
+      <label><i data-lucide="user"></i> Responsável</label>
+      <input id="manager" placeholder="Nome do responsável" />
     </div>
 
-
-     <div>
-      <label>Matrícula do Responsável</label>
-      <input id="matricula" />
+    <div class="form-group">
+      <label><i data-lucide="credit-card"></i> Matrícula do Responsável</label>
+      <input id="matricula" placeholder="Nº matrícula" />
     </div>
- 
-
 
     <fieldset class="full address-group">
-      <legend>Endereço Da Unidade</legend>
+      <legend><i data-lucide="map-pin"></i> Endereço da Unidade</legend>
       <div>
           <label>Rua</label>
-          <input id="location_street" maxlength="80" />
+          <input id="location_street" placeholder="Nome da rua" maxlength="80" />
       </div>
       <div>
           <label>Número</label>
-          <input id="location_number" maxlength="12" />
+          <input id="location_number" placeholder="Nº" maxlength="12" />
       </div>
       <div>
           <label>Bairro</label>
-          <input id="location_neighborhood" maxlength="60" />
+          <input id="location_neighborhood" placeholder="Nome do bairro" maxlength="60" />
       </div>
     </fieldset>
 
-
-    <div class="full">
-      <label>Descrição do equipamento</label>
-      <textarea id="desc" rows="3"></textarea>
+    <div class="form-group full">
+      <label><i data-lucide="align-left"></i> Descrição</label>
+      <textarea id="desc" placeholder="Descrição do departamento..." rows="3"></textarea>
     </div>
-
 
     <div class="full controls">
-      <button type="submit">Salvar</button>
-      <button type="button" class="secondary" id="clearBtn">Limpar</button>
-      <button type="button" id="exportBtn">Exportar Documentos</button>
-      <input id="importFile" type="file" accept="text/csv" style="display:none" />
-      <label for="importFile" style="cursor:pointer;padding:8px 12px;border-radius:4px;background:#eee;color:#000;margin-left:8px">Importar Documentos</label>
+      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Salvar</button>
+      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="trash-2"></i> Limpar</button>
+      <button type="button" class="btn btn-secondary" id="exportBtn"><i data-lucide="download"></i> Exportar CSV</button>
+      <label class="import-area" id="importLabel"><i data-lucide="upload"></i> Importar CSV
+        <input id="importFile" type="file" accept="text/csv" />
+      </label>
     </div>
   </form>
+  </div>
 
 
   <script>
@@ -387,6 +471,25 @@
 
     document.getElementById('clearBtn').addEventListener('click', ()=>{ form.reset(); document.getElementById('idx').value = '' })
 
+    window.edit = function(i){
+      const list = load(); const d = list[i]; if(!d) return
+      document.getElementById('idx').value = i
+      document.getElementById('code').value = d.code || ''
+      document.getElementById('name').value = d.name || ''
+      document.getElementById('manager').value = d.manager || ''
+      document.getElementById('matricula').value = d.matricula || ''
+      if (d.location) {
+        const parts = d.location.split(' - ')
+        const addr = parts[0] || ''
+        const neighborhood = parts[1] || ''
+        const addrParts = addr.split(', ')
+        document.getElementById('location_street').value = addrParts[0] || ''
+        document.getElementById('location_number').value = addrParts[1] || ''
+        document.getElementById('location_neighborhood').value = neighborhood || ''
+      }
+      document.getElementById('desc').value = d.desc || ''
+      window.scrollTo({top:0,behavior:'smooth'})
+    }
 
     document.getElementById('exportBtn').addEventListener('click', ()=>{
       const list = load(); if(list.length===0){ alert('Nenhum dado para exportar'); return }

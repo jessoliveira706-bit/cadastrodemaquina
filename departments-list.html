@@ -5,26 +5,56 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Departamentos - Listagem</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:16px auto;padding:0 16px;color:#222}
-    header{display:flex;align-items:center;gap:8px;justify-content:space-between}
-    header .left{display:flex;align-items:center;gap:8px}
-    a.back{color:#0366d6;text-decoration:none;font-size:13px}
-    h1{font-size:16px;margin-bottom:4px}
-    table{width:100%;border-collapse:collapse;margin-top:8px}
-    th,td{border:1px solid #e6e6e6;padding:4px 6px;text-align:left;font-size:12px}
-    th{background:#f6f8fa}
-    button{padding:4px 10px;border:none;border-radius:3px;cursor:pointer;font-size:12px}
-    .btn-edit{background:#0366d6;color:#fff}
-    .btn-del{background:#d9534f;color:#fff}
-    .empty{text-align:center;color:#888;padding:24px;font-size:13px}
+    * { box-sizing: border-box; }
+    body { max-width: 900px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    header { display: flex; align-items: center; gap: 12px; justify-content: space-between; margin-bottom: 24px; }
+    header .left { display: flex; align-items: center; gap: 12px; }
+    a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
+    a.back:hover { opacity: 1; text-decoration: underline; }
+    h1 { font-size: 1.35rem; font-weight: 700; margin: 0; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    h1 svg { color: #188331; }
 
-    .dropdown{position:relative;display:inline-block}
-    .dropdown-btn{padding:6px 14px;background:#0366d6;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
-    .dropdown-btn:hover{background:#0356b6}
-    .dropdown-content{display:none;position:absolute;right:0;top:100%;background:#fff;min-width:220px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-radius:4px;z-index:10;margin-top:4px}
-    .dropdown-content a{display:block;padding:8px 12px;color:#222;text-decoration:none;font-size:13px}
-    .dropdown-content a:hover{background:#f0f0f0}
-    .dropdown.open .dropdown-content{display:block}
+    .table-card {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      border: 1px solid #f0f0f0; overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 14px; text-align: left; font-size: 0.82rem; }
+    th {
+      background: #f8fafc; font-weight: 600; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.7rem;
+      border-bottom: 1.5px solid #e2e8f0;
+    }
+    td { border-bottom: 1px solid #f0f0f0; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+
+    .empty { text-align: center; color: #94a3b8; padding: 40px 24px; font-size: 0.85rem; }
+
+    .actions { display: flex; gap: 6px; }
+    .btn-sm {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border: none; border-radius: 8px;
+      font-size: 0.75rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-sm svg { width: 14px; height: 14px; }
+    .btn-edit { background: #e2e8f0; color: #475569; }
+    .btn-edit:hover { background: #cbd5e1; }
+    .btn-del { background: #fef2f2; color: #dc2626; }
+    .btn-del:hover { background: #fee2e2; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border: none; border-radius: 10px;
+      font-size: 0.82rem; font-weight: 600; font-family: inherit;
+      background: #188331; color: #fff; text-decoration: none;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
+    .btn-primary svg { width: 16px; height: 16px; }
+    .btn-primary:active { transform: scale(0.97); }
   </style>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -49,32 +79,24 @@
   <header>
     <div class="left">
       <a class="back" href="index.html">← Voltar</a>
-      <h1>Departamentos</h1>
+      <h1><i data-lucide="folder"></i> Departamentos</h1>
     </div>
-    <div class="dropdown" id="deptDropdown">
-      <button class="dropdown-btn" id="dropdownToggle">
-        <i data-lucide="plus" style="width:14px;height:14px"></i> Cadastro <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
-      </button>
-      <div class="dropdown-content">
-        <a href="departments.html"><i data-lucide="file-plus" style="width:14px;height:14px;margin-right:6px"></i> Cadastro de Departamentos</a>
-      </div>
-    </div>
+    <a href="departments.html" class="btn-primary"><i data-lucide="plus"></i> Novo Departamento</a>
   </header>
 
-  <table id="deptTable">
-    <thead>
-      <tr>
-        <th>Código</th>
-        <th>Nome</th>
-        <th>Responsável</th>
-        <th>Matrícula</th>
-        <th>Localização</th>
-        <th>Descrição</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="table-card">
+    <table id="deptTable">
+      <thead>
+        <tr>
+          <th>Nome do departamento</th>
+          <th>Localização</th>
+          <th>Descrição</th>
+          <th style="width:120px">Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
     const STORAGE_KEY = 'departments_v1'
@@ -88,25 +110,25 @@
     function render(){
       const list = load(); tbody.innerHTML = ''
       if(list.length === 0){
-        tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum departamento cadastrado.</td></tr>'
+        tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum departamento cadastrado.</td></tr>'
         return
       }
       list.forEach((d,i)=>{
         const tr = document.createElement('tr')
         tr.innerHTML = `
-          <td>${escapeHtml(d.code)}</td>
           <td>${escapeHtml(d.name)}</td>
-          <td>${escapeHtml(d.manager)}</td>
-          <td>${escapeHtml(d.matricula || '')}</td>
           <td>${escapeHtml(d.location)}</td>
           <td>${escapeHtml(d.desc)}</td>
           <td>
-            <button class="btn-edit" onclick="edit(${i})">Editar</button>
-            <button class="btn-del" onclick="del(${i})">Remover</button>
+            <div class="actions">
+              <button class="btn-sm btn-edit" onclick="edit(${i})"><i data-lucide="edit-3"></i> Editar</button>
+              <button class="btn-sm btn-del" onclick="del(${i})"><i data-lucide="trash-2"></i> Remover</button>
+            </div>
           </td>
         `
         tbody.appendChild(tr)
       })
+      if (typeof lucide !== 'undefined') lucide.createIcons()
     }
 
     window.edit = function(i){
@@ -120,16 +142,7 @@
       const list = load(); list.splice(i,1); save(list)
     }
 
-    // dropdown toggle
-    document.getElementById('dropdownToggle').addEventListener('click', function(e){
-      e.stopPropagation()
-      document.getElementById('deptDropdown').classList.toggle('open')
-    })
-    document.addEventListener('click', function(){
-      document.getElementById('deptDropdown').classList.remove('open')
-    })
-
-    // export    render()
+    render()
     if (typeof lucide !== 'undefined') lucide.createIcons()
   </script>
 </body>

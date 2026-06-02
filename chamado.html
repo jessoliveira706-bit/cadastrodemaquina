@@ -5,17 +5,67 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Chamado - Cadastro</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:16px auto;padding:0 16px;color:#222}
-    header{display:flex;align-items:center;gap:8px}
-    a.back{color:#0366d6;text-decoration:none;font-size:13px}
-    h1{font-size:16px;margin-bottom:4px}
-    form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-    label{display:block;font-size:12px}
-    input,select,textarea{width:100%;padding:4px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px;box-sizing:border-box;margin-top:2px}
-    .full{grid-column:1/-1}
-    .controls{display:flex;gap:6px;align-items:center;margin-top:4px}
-    button{padding:4px 10px;border:none;background:#0366d6;color:#fff;border-radius:3px;cursor:pointer;font-size:12px}
-    button.secondary{background:#6c757d}
+    * { box-sizing: border-box; }
+    body { max-width: 680px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
+    a.back:hover { opacity: 1; text-decoration: underline; }
+    h1 { font-size: 1.35rem; font-weight: 700; margin: 0; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    h1 svg { color: #188331; }
+
+    .form-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      padding: 28px 28px 20px;
+      margin-bottom: 32px;
+      border: 1px solid #f0f0f0;
+    }
+
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+    .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label {
+      font-size: 0.75rem; font-weight: 600; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-group label svg { width: 14px; height: 14px; color: #188331; flex-shrink: 0; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 0.9rem; font-family: inherit; color: #1e293b;
+      background: #f8fafc; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #188331;
+      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
+      background: #fff;
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    .controls {
+      grid-column: 1 / -1;
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      margin-top: 4px; padding-top: 18px; border-top: 1.5px solid #e2e8f0;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border: none; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn svg { width: 17px; height: 17px; }
+    .btn-primary { background: #188331; color: #fff; }
+    .btn-primary:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; transform: translateY(-1px); }
+    .btn:active { transform: scale(0.97); }
   </style>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -42,23 +92,24 @@
     <h1>Cadastro de Chamado</h1>
   </header>
 
+  <div class="form-card">
   <form id="callForm">
     <input type="hidden" id="idx" />
 
-    <div>
-      <label>Máquina</label>
-      <input id="machine" required />
+    <div class="form-group">
+      <label><i data-lucide="monitor"></i> Máquina</label>
+      <input id="machine" placeholder="Patrimônio ou nome da máquina" required />
     </div>
-    <div>
-      <label>Departamento</label>
-      <input id="dept" />
+    <div class="form-group">
+      <label><i data-lucide="folder"></i> Departamento</label>
+      <input id="dept" placeholder="Nome do departamento" />
     </div>
-    <div class="full">
-      <label>Descrição</label>
-      <textarea id="desc" rows="2"></textarea>
+    <div class="form-group full">
+      <label><i data-lucide="align-left"></i> Descrição</label>
+      <textarea id="desc" placeholder="Descreva o problema ou motivo do chamado..." rows="3"></textarea>
     </div>
-    <div>
-      <label>Status</label>
+    <div class="form-group">
+      <label><i data-lucide="circle"></i> Status</label>
       <select id="status">
         <option value="Aguardando">Aguardando</option>
         <option value="Em manutenção">Em manutenção</option>
@@ -66,10 +117,11 @@
       </select>
     </div>
     <div class="full controls">
-      <button type="submit">Salvar</button>
-      <button type="button" class="secondary" id="clearBtn">Limpar</button>
+      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Salvar</button>
+      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="trash-2"></i> Limpar</button>
     </div>
   </form>
+  </div>
 
   <script>
     const KEY = 'calls_v1'

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - Sistema de Máquinas</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%; margin: 0; padding: 0;
+      font-family: 'Inter', Arial, Helvetica, sans-serif;
+      background: #f5f7fa;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .login-wrapper {
+      width: 100%; max-width: 400px; padding: 24px;
+    }
+
+    .login-card {
+      background: #fff; border-radius: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 40px 32px 32px;
+      border: 1px solid #f0f0f0;
+    }
+
+    .login-logo {
+      display: flex; flex-direction: column; align-items: center;
+      margin-bottom: 32px;
+    }
+    .login-logo img {
+      height: 56px; width: auto; margin-bottom: 16px;
+    }
+    .login-logo h1 {
+      font-size: 1.25rem; font-weight: 700; color: #1e293b;
+      margin: 0; text-align: center;
+    }
+    .login-logo p {
+      margin: 6px 0 0; font-size: 0.85rem; color: #64748b;
+    }
+
+    .form-group {
+      display: flex; flex-direction: column; gap: 5px; margin-bottom: 18px;
+    }
+    .form-group label {
+      font-size: 0.75rem; font-weight: 600; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-group label svg { width: 14px; height: 14px; color: #188331; flex-shrink: 0; }
+    .form-group input {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 0.9rem; font-family: inherit; color: #1e293b;
+      background: #f8fafc; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .form-group input:focus {
+      border-color: #188331;
+      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
+      background: #fff;
+    }
+
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 12px; border: none; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn svg { width: 18px; height: 18px; }
+    .btn-primary { background: #188331; color: #fff; }
+    .btn-primary:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
+    .btn:active { transform: scale(0.97); }
+
+    .error-msg {
+      font-size: 0.8rem; color: #dc2626; font-weight: 500;
+      display: none; align-items: center; gap: 6px;
+      margin-bottom: 16px; padding: 10px 12px;
+      background: #fef2f2; border-radius: 8px;
+      border: 1px solid #fecaca;
+    }
+    .error-msg.show { display: flex; }
+    .error-msg svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .register-link {
+      text-align: center; margin-top: 20px; font-size: 0.82rem; color: #64748b;
+    }
+    .register-link a {
+      color: #188331; text-decoration: none; font-weight: 600;
+    }
+    .register-link a:hover { text-decoration: underline; }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="logo_secretaria_gecotec.png" alt="Logotipo" onerror="this.style.display='none'" />
+        <h1>Sistema de Máquinas</h1>
+        <p>Faça login para continuar</p>
+      </div>
+
+      <div class="error-msg" id="loginError"><i data-lucide="alert-circle"></i> <span id="errorText">E-mail ou senha inválidos</span></div>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label><i data-lucide="mail"></i> E-mail</label>
+          <input id="email" type="email" placeholder="seu@email.com" required autofocus />
+        </div>
+        <div class="form-group">
+          <label><i data-lucide="lock"></i> Senha</label>
+          <input id="password" type="password" placeholder="Sua senha" required />
+        </div>
+        <button type="submit" class="btn btn-primary"><i data-lucide="log-in"></i> Entrar</button>
+      </form>
+
+      <div class="register-link">
+        Não tem conta? <a href="usuarios.html">Cadastre-se</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm')
+    const errorEl = document.getElementById('loginError')
+    const errorText = document.getElementById('errorText')
+
+    function showError(msg) {
+      errorText.textContent = msg
+      errorEl.classList.add('show')
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault()
+      errorEl.classList.remove('show')
+
+      const email = document.getElementById('email').value.trim()
+      const password = document.getElementById('password').value
+
+      if (!email || !password) { showError('Preencha todos os campos'); return }
+
+      const users = JSON.parse(localStorage.getItem('usuarios_v1') || '[]')
+      const user = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase())
+
+      if (!user) { showError('Usuário não encontrado'); return }
+      if (user.password && user.password !== password) { showError('Senha incorreta'); return }
+      if (!user.password) { showError('Usuário sem senha cadastrada'); return }
+
+      const initials = user.name
+        ? user.name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+        : 'U'
+      localStorage.setItem('user_initials', initials)
+      window.location.href = 'index.html'
+    })
+
+    if (typeof lucide !== 'undefined') lucide.createIcons()
+  </script>
+</body>
+</html>

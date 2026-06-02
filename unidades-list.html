@@ -5,26 +5,59 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Unidades - Listagem</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:16px auto;padding:0 16px;color:#222}
-    header{display:flex;align-items:center;gap:8px;justify-content:space-between}
-    header .left{display:flex;align-items:center;gap:8px}
-    a.back{color:#0366d6;text-decoration:none;font-size:13px}
-    h1{font-size:16px;margin-bottom:4px}
-    table{width:100%;border-collapse:collapse;margin-top:8px}
-    th,td{border:1px solid #e6e6e6;padding:4px 6px;text-align:left;font-size:12px}
-    th{background:#f6f8fa}
-    button{padding:4px 10px;border:none;border-radius:3px;cursor:pointer;font-size:12px}
-    .btn-edit{background:#0366d6;color:#fff}
-    .btn-del{background:#d9534f;color:#fff}
-    .empty{text-align:center;color:#888;padding:24px;font-size:13px}
+    * { box-sizing: border-box; }
+    body { max-width: 900px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; justify-content: space-between; }
+    header .left { display: flex; align-items: center; gap: 12px; }
+    a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
+    a.back:hover { opacity: 1; text-decoration: underline; }
+    h1 { font-size: 1.35rem; font-weight: 700; margin: 0; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    h1 svg { color: #188331; }
 
-    .dropdown{position:relative;display:inline-block}
-    .dropdown-btn{padding:6px 14px;background:#0366d6;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px}
-    .dropdown-btn:hover{background:#0356b6}
-    .dropdown-content{display:none;position:absolute;right:0;top:100%;background:#fff;min-width:220px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-radius:4px;z-index:10;margin-top:4px}
-    .dropdown-content a{display:block;padding:8px 12px;color:#222;text-decoration:none;font-size:13px}
-    .dropdown-content a:hover{background:#f0f0f0}
-    .dropdown.open .dropdown-content{display:block}
+    .table-card {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      border: 1px solid #f0f0f0; overflow: hidden; margin-bottom: 32px;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 12px 14px; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      background: #f8fafc; color: #475569;
+      border-bottom: 1.5px solid #e2e8f0; text-align: left;
+    }
+    td {
+      padding: 11px 14px; font-size: 0.85rem; color: #334155;
+      border-bottom: 1px solid #f1f5f9; vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+    .empty { text-align: center; color: #94a3b8; padding: 32px; font-size: 0.85rem; }
+
+    .actions { display: flex; gap: 6px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border: none; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn svg { width: 13px; height: 13px; }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
+    .btn-danger:hover { background: #fecaca; }
+    .btn:active { transform: scale(0.96); }
+
+    .btn-cadastro {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border: none; border-radius: 10px;
+      font-size: 0.82rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; background: #188331; color: #fff;
+      transition: all 0.2s; text-decoration: none;
+    }
+    .btn-cadastro:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
+    .btn-cadastro svg { width: 16px; height: 16px; }
+    .btn-cadastro:active { transform: scale(0.97); }
   </style>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -49,18 +82,12 @@
   <header>
     <div class="left">
       <a class="back" href="index.html">← Voltar</a>
-      <h1>Unidades</h1>
+      <h1><i data-lucide="building"></i> Unidades</h1>
     </div>
-    <div class="dropdown" id="unitDropdown">
-      <button class="dropdown-btn" id="dropdownToggle">
-        <i data-lucide="plus" style="width:14px;height:14px"></i> Cadastro <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
-      </button>
-      <div class="dropdown-content">
-        <a href="unidades.html"><i data-lucide="file-plus" style="width:14px;height:14px;margin-right:6px"></i> Cadastro de Unidades</a>
-      </div>
-    </div>
+    <a href="unidades.html" class="btn-cadastro"><i data-lucide="plus"></i> Nova Unidade</a>
   </header>
 
+  <div class="table-card">
   <table id="unitTable">
     <thead>
       <tr>
@@ -73,6 +100,7 @@
     </thead>
     <tbody></tbody>
   </table>
+  </div>
 
   <script>
     const STORAGE_KEY = 'units_list_v1'
@@ -101,9 +129,9 @@
           <td>${escapeHtml(u.address)}</td>
           <td>${escapeHtml(u.cep)}</td>
           <td>${escapeHtml(u.phone)}</td>
-          <td>
-            <button class="btn-edit" onclick="edit(${i})">Editar</button>
-            <button class="btn-del" onclick="del(${i})">Remover</button>
+          <td class="actions">
+            <button class="btn btn-secondary" onclick="edit(${i})"><i data-lucide="pencil"></i> Editar</button>
+            <button class="btn btn-danger" onclick="del(${i})"><i data-lucide="trash-2"></i> Remover</button>
           </td>
         `
         tbody.appendChild(tr)
@@ -120,13 +148,6 @@
       const list = load(); list.splice(i,1); save(list)
     }
 
-    document.getElementById('dropdownToggle').addEventListener('click', function(e){
-      e.stopPropagation()
-      document.getElementById('unitDropdown').classList.toggle('open')
-    })
-    document.addEventListener('click', function(){
-      document.getElementById('unitDropdown').classList.remove('open')
-    })
     render()
     if (typeof lucide !== 'undefined') lucide.createIcons()
   </script>

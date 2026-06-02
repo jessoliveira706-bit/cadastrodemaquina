@@ -5,22 +5,82 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Usuários - Cadastro</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:16px auto;padding:0 16px;color:#222}
-    header{display:flex;align-items:center;gap:8px}
-    a.back{color:#0366d6;text-decoration:none;font-size:13px}
-    h1{font-size:16px;margin-bottom:4px}
-    .split{display:flex;gap:16px;margin-top:8px;min-height:200px}
-    .split > div{flex:1;border:1px solid #e0e0e0;border-radius:6px;padding:12px;display:flex;flex-direction:column}
-    .split > div:first-child{background:#fafafa}
-    form{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-    label{display:block;font-size:12px}
-    input,textarea,select{width:100%;padding:4px 6px;border:1px solid #ccc;border-radius:3px;margin-top:2px;margin-bottom:2px;font-size:12px;box-sizing:border-box}
-    .full{grid-column:1 / -1}
-    .controls{display:flex;gap:6px;align-items:center;margin-top:4px}
-    button{padding:4px 10px;border:none;background:#0366d6;color:#fff;border-radius:3px;cursor:pointer;font-size:12px}
-    button.secondary{background:#6c757d}
-    .btn-list{display:flex;align-items:center;justify-content:center;height:100%;font-size:14px;padding:12px 24px;background:#0366d6;color:#fff;border:none;border-radius:6px;cursor:pointer;text-decoration:none;text-align:center}
-    .btn-list:hover{background:#0356b6}
+    * { box-sizing: border-box; }
+    body { max-width: 800px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
+    a.back:hover { opacity: 1; text-decoration: underline; }
+    h1 { font-size: 1.35rem; font-weight: 700; margin: 0; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    h1 svg { color: #188331; }
+    p.muted { color: #64748b; font-size: 0.85rem; margin: -16px 0 20px; }
+
+    .split { display: flex; gap: 20px; margin-top: 4px; min-height: 200px; }
+    .split > div { flex: 1; }
+
+    .form-card {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      padding: 28px 28px 20px; border: 1px solid #f0f0f0;
+    }
+
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+    .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label {
+      font-size: 0.75rem; font-weight: 600; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-group label svg { width: 14px; height: 14px; color: #188331; flex-shrink: 0; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 0.9rem; font-family: inherit; color: #1e293b;
+      background: #f8fafc; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #188331;
+      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
+      background: #fff;
+    }
+    .form-group input.error,
+    .form-group input.error:focus {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.12);
+      background: #fef2f2;
+    }
+    .form-group .error-msg {
+      font-size: 0.75rem; color: #dc2626; font-weight: 500;
+      display: none; align-items: center; gap: 4px; margin-top: 2px;
+    }
+    .form-group .error-msg.show { display: flex; }
+    .form-group .error-msg svg { width: 13px; height: 13px; }
+    .form-group textarea { resize: vertical; min-height: 70px; }
+
+    .controls {
+      grid-column: 1 / -1;
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      margin-top: 4px; padding-top: 16px; border-top: 1.5px solid #e2e8f0;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border: none; border-radius: 10px;
+      font-size: 0.82rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn svg { width: 16px; height: 16px; }
+    .btn-primary { background: #188331; color: #fff; }
+    .btn-primary:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; transform: translateY(-1px); }
+    .btn:active { transform: scale(0.97); }
+
+    @media (max-width: 650px) { .split { flex-direction: column; } }
   </style>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -44,55 +104,62 @@
   </div>
   <header>
     <a class="back" href="index.html">← Voltar</a>
-    <h1>Cadastro de Usuários</h1>
+    <h1><i data-lucide="users"></i> Cadastro de Usuários</h1>
   </header>
   <p class="muted">Cadastre usuários do sistema.</p>
 
-  <div class="split">
-    <div>
-      <form id="userForm">
-        <input type="hidden" id="idx" />
+  <div class="form-card" style="padding-bottom:16px">
+    <form id="userForm">
+      <input type="hidden" id="idx" />
 
-        <div>
-          <label>Nome completo</label>
-          <input id="name" required />
-        </div>
+      <div class="form-group">
+        <label><i data-lucide="user"></i> Nome completo</label>
+        <input id="name" placeholder="Nome do usuário" required />
+      </div>
 
-        <div>
-          <label>E-mail</label>
-          <input id="email" type="email" />
-        </div>
+      <div class="form-group">
+        <label><i data-lucide="mail"></i> E-mail</label>
+        <input id="email" type="email" placeholder="email@exemplo.com" />
+      </div>
 
-        <div class="full">
-          <label>Departamento</label>
-          <select id="dept"></select>
-        </div>
+      <div class="form-group">
+        <label><i data-lucide="lock"></i> Senha</label>
+        <input id="password" type="password" placeholder="Mínimo 6 caracteres" />
+      </div>
 
-         <div class="full">
-          <label>secretaria</label>
-          <select id="dept"></select>
-        </div>
+      <div class="form-group">
+        <label><i data-lucide="lock"></i> Repetir senha</label>
+        <input id="password_confirm" type="password" placeholder="Repita a senha" />
+        <span class="error-msg" id="passwordError"><i data-lucide="alert-circle"></i> As senhas não correspondem</span>
+      </div>
 
-        <div class="full">
-          <label>Observação</label>
-          <textarea id="obs" rows="2"></textarea>
-        </div>
+      <div class="form-group full">
+        <label><i data-lucide="folder"></i> Departamento</label>
+        <select id="dept"></select>
+      </div>
 
-        <div class="full controls">
-          <button type="submit">Salvar</button>
-          <button type="button" class="secondary" id="clearBtn">Limpar</button>
-        </div>
-      </form>
-    </div>
-    <div>
-      <a href="usuarios-list.html" class="btn-list">Usuários Cadastrados</a>
-    </div>
+      <div class="form-group full">
+        <label><i data-lucide="building"></i> Secretaria</label>
+        <select id="secretaria"></select>
+      </div>
+
+      <div class="form-group full">
+        <label><i data-lucide="align-left"></i> Observação</label>
+        <textarea id="obs" placeholder="Observações sobre o usuário..." rows="2"></textarea>
+      </div>
+
+      <div class="full controls">
+        <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Salvar</button>
+        <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="trash-2"></i> Limpar</button>
+      </div>
+    </form>
   </div>
 
   <script>
     const STORAGE_KEY = 'usuarios_v1'
     const form = document.getElementById('userForm')
     const deptSelect = document.getElementById('dept')
+    const secretariaSelect = document.getElementById('secretaria')
 
     function load(){
       try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }catch(e){return[]}
@@ -102,39 +169,75 @@
     function loadDepts(){
       const depts = JSON.parse(localStorage.getItem('departments_v1') || '[]')
       deptSelect.innerHTML = '<option value="">-- selecione --</option>'
+      secretariaSelect.innerHTML = '<option value="">-- selecione --</option>'
       depts.forEach(d => {
-        const o = document.createElement('option')
-        o.value = d.code
-        o.textContent = d.name + (d.code ? ' (' + d.code + ')' : '')
-        deptSelect.appendChild(o)
+        const o1 = document.createElement('option')
+        o1.value = d.code
+        o1.textContent = d.name + (d.code ? ' (' + d.code + ')' : '')
+        deptSelect.appendChild(o1)
+        const o2 = document.createElement('option')
+        o2.value = d.code
+        o2.textContent = d.name + (d.code ? ' (' + d.code + ')' : '')
+        secretariaSelect.appendChild(o2)
       })
     }
 
     form.addEventListener('submit', e=>{
       e.preventDefault()
       const idx = document.getElementById('idx').value
+      const password = document.getElementById('password').value
+      const password_confirm = document.getElementById('password_confirm').value
+      if(password && password.length < 6){ alert('A senha deve ter no mínimo 6 caracteres'); return }
+      if(password !== password_confirm){ return }
       const item = {
-        "name completo": document.getElementById('name').value.trim(),
+        name: document.getElementById('name').value.trim(),
         email: document.getElementById('email').value.trim(),
+        password: password,
         dept: document.getElementById('dept').value,
-        secretaria: document.getElementById('obs').value.trim()
+        secretaria: document.getElementById('secretaria').value
       }
-      if(!item["name completo"]){ alert('Informe o nome do usuário'); return }
+      if(!item.name){ alert('Informe o nome do usuário'); return }
       const list = load()
       if(idx==='') list.push(item); else list[Number(idx)] = item
       save(list)
       form.reset(); document.getElementById('idx').value = ''
     })
 
-    document.getElementById('clearBtn').addEventListener('click', ()=>{ form.reset(); document.getElementById('idx').value = '' })
+    document.getElementById('clearBtn').addEventListener('click', ()=>{ form.reset(); document.getElementById('idx').value = ''; clearPasswordError() })
+
+    function validatePasswords(){
+      const pwd = document.getElementById('password')
+      const conf = document.getElementById('password_confirm')
+      const err = document.getElementById('passwordError')
+      if(conf.value && pwd.value !== conf.value){
+        pwd.classList.add('error')
+        conf.classList.add('error')
+        err.classList.add('show')
+        return false
+      }
+      clearPasswordError()
+      return true
+    }
+    function clearPasswordError(){
+      const pwd = document.getElementById('password')
+      const conf = document.getElementById('password_confirm')
+      const err = document.getElementById('passwordError')
+      pwd.classList.remove('error')
+      conf.classList.remove('error')
+      err.classList.remove('show')
+    }
+    document.getElementById('password').addEventListener('input', validatePasswords)
+    document.getElementById('password_confirm').addEventListener('input', validatePasswords)
 
     window.edit = function(i){
       const list = load(); const u = list[i]; if(!u) return
       document.getElementById('idx').value = i
-      document.getElementById('name').value = u["name completo"]
-      document.getElementById('email').value = u.email
-      document.getElementById('dept').value = u.dept
-      document.getElementById('secretaria').value = u.secretaria
+      document.getElementById('name').value = u.name || u["name completo"] || ''
+      document.getElementById('email').value = u.email || ''
+      document.getElementById('password').value = u.password || ''
+      document.getElementById('password_confirm').value = u.password || ''
+      document.getElementById('dept').value = u.dept || ''
+      document.getElementById('secretaria').value = u.secretaria || ''
       window.scrollTo({top:0,behavior:'smooth'})
     }
 

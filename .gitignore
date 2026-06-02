@@ -28,6 +28,29 @@ coverage/
 .DS_Store
 Thumbs.db
 
+# Variáveis de ambiente (adicional)
+.env.production
+.env.development
+.env.test
+
 # Configurações do editor
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+
+# Windows
+desktop.ini
+
+# TypeScript
+*.tsbuildinfo
+
+# Gerenciadores de pacote (lockfiles alternativos)
+yarn.lock
+pnpm-lock.yaml
+
+# Cache do npm/pnpm
+.npm/
+.eslintcache
+.stylelintcache
