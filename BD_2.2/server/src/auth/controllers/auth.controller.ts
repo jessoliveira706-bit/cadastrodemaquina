@@ -19,6 +19,10 @@ export async function login(req: Request, res: Response): Promise<void> {
       res.status(401).json({ error: message });
       return;
     }
+    if (message === "Sem permissão de acesso") {
+      res.status(403).json({ error: message });
+      return;
+    }
     console.error("Falha no login:", message);
     res.status(503).json({ error: "Serviço de autenticação indisponível" });
   }

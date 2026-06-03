@@ -92,9 +92,9 @@
     <thead>
       <tr>
         <th>Nome</th>
-        <th>Município</th>
+        <th>Endereço</th>
+        <th>CEP</th>
         <th>Telefone</th>
-        <th>Descrição</th>
         <th>Ações</th>
       </tr>
     </thead>
@@ -103,52 +103,49 @@
   </div>
 
   <script>
+    const STORAGE_KEY = 'units_list_v1'
     const tbody = document.querySelector('#unitTable tbody')
 
-    async function render(){
-      tbody.innerHTML = '<tr><td colspan="5" class="empty">Carregando...</td></tr>'
-      let list = [], municipios = []
-      try {
-        [list, municipios] = await Promise.all([
-          apiFetch('/api/unidades').then(r => r.json()),
-          apiFetch('/api/municipios').then(r => r.json()),
-        ])
-      } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">Erro ao carregar dados.</td></tr>'
-        return
-      }
-      const munNome = Object.fromEntries(municipios.map(m => [m.id, m.nome]))
-      tbody.innerHTML = ''
+    function load(){
+      try{
+        const v = JSON.parse(localStorage.getItem(STORAGE_KEY))
+        if(!Array.isArray(v) || v.length===0) return []
+        if(typeof v[0] === 'string') return v.map(n=>({ name: n, address: '', cep: '', phone: '' }))
+        return v.map(u=>({ name: u.name||'', address: u.address||'', cep: u.cep||'', phone: u.phone||'' }))
+      }catch(e){ return [] }
+    }
+    function save(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); render() }
+
+    function render(){
+      const list = load(); tbody.innerHTML = ''
       if(list.length === 0){
         tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhuma unidade cadastrada.</td></tr>'
         return
       }
-      list.forEach(u=>{
+      list.forEach((u,i)=>{
         const tr = document.createElement('tr')
         tr.innerHTML = `
-          <td>${escapeHtml(u.nome)}</td>
-          <td>${escapeHtml(munNome[u.municipios_id] || '—')}</td>
-          <td>${escapeHtml(u.telefone || '')}</td>
-          <td>${escapeHtml(u.descricao || '')}</td>
+          <td>${escapeHtml(u.name)}</td>
+          <td>${escapeHtml(u.address)}</td>
+          <td>${escapeHtml(u.cep)}</td>
+          <td>${escapeHtml(u.phone)}</td>
           <td class="actions">
-            <button class="btn btn-secondary" onclick="edit(${u.id})"><i data-lucide="pencil"></i> Editar</button>
-            <button class="btn btn-danger" onclick="del(${u.id})"><i data-lucide="trash-2"></i> Remover</button>
+            <button class="btn btn-secondary" onclick="edit(${i})"><i data-lucide="pencil"></i> Editar</button>
+            <button class="btn btn-danger" onclick="del(${i})"><i data-lucide="trash-2"></i> Remover</button>
           </td>
         `
         tbody.appendChild(tr)
       })
-      if (typeof lucide !== 'undefined') lucide.createIcons()
     }
 
-    window.edit = function(id){
-      sessionStorage.setItem('editUnitId', id)
+    window.edit = function(i){
+      sessionStorage.setItem('editUnitIdx', i)
       window.location.href = 'unidades.html'
     }
 
-    window.del = async function(id){
+    window.del = function(i){
       if(!confirm('Remover esta unidade?')) return
-      try { await apiFetch('/api/unidades/' + id, { method: 'DELETE' }); render() }
-      catch (e) { alert('Falha ao remover.') }
+      const list = load(); list.splice(i,1); save(list)
     }
 
     render()

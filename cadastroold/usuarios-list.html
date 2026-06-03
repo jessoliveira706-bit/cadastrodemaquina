@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Departamentos - Listagem</title>
+  <title>Usuários - Listagem</title>
   <style>
     * { box-sizing: border-box; }
     body { max-width: 900px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
@@ -79,18 +79,19 @@
   <header>
     <div class="left">
       <a class="back" href="index.html">← Voltar</a>
-      <h1><i data-lucide="folder"></i> Departamentos</h1>
+      <h1><i data-lucide="users"></i> Usuários Cadastrados</h1>
     </div>
-    <a href="departments.html" class="btn-primary"><i data-lucide="plus"></i> Novo Departamento</a>
+    <a href="usuarios.html" class="btn-primary"><i data-lucide="plus"></i> Novo Usuário</a>
   </header>
 
   <div class="table-card">
-    <table id="deptTable">
+    <table id="userTable">
       <thead>
         <tr>
-          <th>Nome do departamento</th>
-          <th>Secretaria</th>
-          <th>Descrição</th>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Departamento</th>
+          <th>Observação</th>
           <th style="width:120px">Ações</th>
         </tr>
       </thead>
@@ -99,36 +100,37 @@
   </div>
 
   <script>
-    const tbody = document.querySelector('#deptTable tbody')
+    const STORAGE_KEY = 'usuarios_v1'
+    const tbody = document.querySelector('#userTable tbody')
 
-    async function render(){
-      tbody.innerHTML = '<tr><td colspan="4" class="empty">Carregando...</td></tr>'
-      let list = [], secretarias = []
-      try {
-        [list, secretarias] = await Promise.all([
-          apiFetch('/api/departamentos').then(r => r.json()),
-          apiFetch('/api/secretarias').then(r => r.json()),
-        ])
-      } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty">Erro ao carregar dados.</td></tr>'
-        return
-      }
-      const secNome = Object.fromEntries(secretarias.map(s => [s.id, s.nome]))
-      tbody.innerHTML = ''
+    function load(){
+      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }catch(e){return[]}
+    }
+    function save(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); render() }
+
+    function render(){
+      const list = load(); tbody.innerHTML = ''
+      const depts = JSON.parse(localStorage.getItem('departments_v1') || '[]')
+      const deptMap = {}
+      depts.forEach(d => { deptMap[d.code] = d.name })
+
       if(list.length === 0){
-        tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum departamento cadastrado.</td></tr>'
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum usuário cadastrado.</td></tr>'
         return
       }
-      list.forEach(d=>{
+
+      list.forEach((u,i)=>{
         const tr = document.createElement('tr')
+        const nome = u.name || u["name completo"] || ''
         tr.innerHTML = `
-          <td>${escapeHtml(d.nome)}</td>
-          <td>${escapeHtml(secNome[d.secretarias_id] || '—')}</td>
-          <td>${escapeHtml(d.descricao || '')}</td>
+          <td>${escapeHtml(nome)}</td>
+          <td>${escapeHtml(u.email)}</td>
+          <td>${escapeHtml(deptMap[u.dept] || u.dept || '')}</td>
+          <td>${escapeHtml(u.obs || u.secretaria || '')}</td>
           <td>
             <div class="actions">
-              <button class="btn-sm btn-edit" onclick="edit(${d.id})"><i data-lucide="edit-3"></i> Editar</button>
-              <button class="btn-sm btn-del" onclick="del(${d.id})"><i data-lucide="trash-2"></i> Remover</button>
+              <button class="btn-sm btn-edit" onclick="edit(${i})"><i data-lucide="edit-3"></i> Editar</button>
+              <button class="btn-sm btn-del" onclick="del(${i})"><i data-lucide="trash-2"></i> Remover</button>
             </div>
           </td>
         `
@@ -137,17 +139,14 @@
       if (typeof lucide !== 'undefined') lucide.createIcons()
     }
 
-    window.edit = function(id){
-      sessionStorage.setItem('editDeptId', id)
-      window.location.href = 'departments.html'
+    window.edit = function(i){
+      sessionStorage.setItem('editUserIdx', i)
+      window.location.href = 'usuarios.html'
     }
 
-    window.del = async function(id){
-      if(!confirm('Remover este departamento?')) return
-      try {
-        await apiFetch('/api/departamentos/' + id, { method: 'DELETE' })
-        render()
-      } catch (e) { alert('Falha ao remover.') }
+    window.del = function(i){
+      if(!confirm('Remover este usuário?')) return
+      const list = load(); list.splice(i,1); save(list)
     }
 
     render()

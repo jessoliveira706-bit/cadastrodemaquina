@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Departamentos - Cadastro</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { max-width: 880px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
+    a.back:hover { opacity: 1; text-decoration: underline; }
+    h1 { font-size: 1.35rem; font-weight: 700; margin: 0; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    h1 svg { color: #188331; }
+    p.muted { color: #64748b; font-size: 0.85rem; margin: -16px 0 20px; }
+
+    .form-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      padding: 28px 28px 20px;
+      margin-bottom: 32px;
+      border: 1px solid #f0f0f0;
+    }
+
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+    .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label {
+      font-size: 0.75rem; font-weight: 600; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .form-group label svg { width: 14px; height: 14px; color: #188331; flex-shrink: 0; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 0.9rem; font-family: inherit; color: #1e293b;
+      background: #f8fafc; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #188331;
+      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
+      background: #fff;
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    input#matricula { max-width: 160px; }
+
+    fieldset.address-group {
+      grid-column: 1 / -1;
+      background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px;
+      padding: 20px 24px 12px; margin: 0;
+      display: grid; grid-template-columns: 1fr 120px 1fr; gap: 14px 20px;
+    }
+    fieldset.address-group legend {
+      grid-column: 1 / -1;
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: #188331; padding: 0;
+      display: flex; align-items: center; gap: 6px; margin-bottom: 2px;
+    }
+    fieldset.address-group legend svg { width: 15px; height: 15px; }
+    fieldset.address-group > div { margin: 0; }
+    fieldset.address-group label { font-size: 0.75rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    fieldset.address-group input {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0;
+      border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: #1e293b;
+      background: #fff; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    fieldset.address-group input:focus {
+      border-color: #188331;
+      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
+    }
+
+    .controls {
+      grid-column: 1 / -1;
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      margin-top: 6px; padding-top: 18px; border-top: 1.5px solid #e2e8f0;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border: none; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn svg { width: 17px; height: 17px; }
+    .btn-primary { background: #188331; color: #fff; }
+    .btn-primary:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; transform: translateY(-1px); }
+    .btn-success { background: #059669; color: #fff; }
+    .btn-success:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,150,105,0.25); }
+    .btn:active { transform: scale(0.97); }
+
+    .import-area {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; background: #f1f5f9; color: #475569;
+      border: 1.5px dashed #cbd5e1; transition: all 0.2s;
+      margin-left: auto;
+    }
+    .import-area:hover { background: #e2e8f0; border-color: #94a3b8; }
+    .import-area svg { width: 17px; height: 17px; }
+    input[type=file] { display: none; }
+
+    @media (max-width: 700px) {
+      form { grid-template-columns: 1fr; }
+      .full { grid-column: 1; }
+      fieldset.address-group { grid-template-columns: 1fr; }
+      fieldset.address-group legend { grid-column: 1; }
+      .controls { flex-direction: column; align-items: stretch; }
+      .import-area { margin-left: 0; }
+    }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="utils.js"></script>
+</head>
+<body>
+  <a href="index.html" id="logo-link"><img id="site-logo" src="logo_secretaria_gecotec.png" alt="Logotipo"></a>
+  <button id="btnSair" class="btn-sair" title="Sair"><i data-lucide="log-out"></i></button>
+  <div class="sidebar">
+    <div class="user-avatar" id="userAvatar">U</div>
+    <nav>
+      <ul>
+        <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
+        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
+        <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
+        <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
+        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        </ul>
+    </nav>
+  </div>
+  <header>
+    <a class="back" href="index.html">← Voltar</a>
+    <h1>Cadastro de Departamentos</h1>
+  </header>
+  <p class="muted">Cadastre departamentos e gerencie responsáveis.</p>
+
+
+  <div class="form-card">
+  <form id="deptForm">
+    <input type="hidden" id="idx" />
+
+    <div class="form-group">
+      <label><i data-lucide="hash"></i> Código</label>
+      <input id="code" placeholder="Código do departamento" required />
+    </div>
+
+    <div class="form-group">
+      <label><i data-lucide="building-2"></i> Nome do Departamento</label>
+      <input id="name" placeholder="Nome do departamento" />
+    </div>
+
+    <div class="form-group full">
+      <label><i data-lucide="folder"></i> Unidade</label>
+      <select id="unidade">
+        <option value="">-- selecione --</option>
+        <option>Departamentos da prefeitura</option>
+        <option>Departamento de Tecnologia Interna/Informática</option>
+        <option>Departamento de Comunicação</option>
+        <option>Departamento de ODS -IEG-M</option>
+        <option>Departamento de Gestão Administrativa</option>
+        <option>Departamento de Relações Públicas e Organizacionais</option>
+        <option>Controladoria</option>
+        <option>Ouvidoria</option>
+        <option>Divisão de Transparência da Administração Municipal</option>
+        <option>Procuradoria do Município</option>
+        <option>Departamento de Procedimentos Administrativos</option>
+        <option>Departamento Jurídico</option>
+        <option>Departamento de Atos</option>
+        <option>Gabinete do Secretário Adjunto</option>
+        <option>INSS</option>
+        <option>Departamento de Cerimonial</option>
+        <option>Departamento de Relações Institucionais</option>
+        <option>Departamento de Assuntos Estratégicos</option>
+        <option>Fundo de Ação e Economia Solidária</option>
+        <option>Departamento de Defesa Civil</option>
+        <option>Departamento de Licitações</option>
+        <option>Administração Patrimonial</option>
+        <option>Divisão de Apoio Técnico e Operacional</option>
+        <option>Departamento de Controle de Processos</option>
+        <option>Departamento de Gestão Financeira</option>
+        <option>Departamento de Projetos e Parcerias</option>
+        <option>Departamento de Gestão de Pessoas</option>
+        <option>Departamento de Planejamento</option>
+        <option>Fundo - RPPS</option>
+        <option>Departamento da Guarda Civil Municipal</option>
+        <option>Divisão de Vigilância Patrimonial</option>
+        <option>Departamento de Atendimento Central</option>
+        <option>Departamento de Trânsito e Mobilidade</option>
+        <option>Departamento de Trabalho, Indústria e Comércio</option>
+        <option>Departamento de Atividade Compartilhada de Inteligência</option>
+        <option>Departamento de Tributos</option>
+        <option>Departamento de Habitação</option>
+        <option>Departamento de Regularização Fundiária e Fiscalização e Proteção de Áreas Públicas</option>
+        <option>Departamento de Arrecadação e Dívida Ativa</option>
+        <option>Departamento do Meio Ambiente, Clima e Energia</option>
+        <option>Departamento de Fiscalização</option>
+        <option>Departamento de Defesa das Relações de Consumo</option>
+        <option>Departamento de Gerenciamento de Obras</option>
+        <option>Departamento de Vigilância Socioassistencial</option>
+        <option>Departamento de Gerenciamento de Infraestrutura Urbana</option>
+        <option>Departamento de Proteção Social Especial</option>
+        <option>Departamento de Proteção Social Básica</option>
+        <option>Departamento de Serviços Urbanos</option>
+        <option>Departamento de Garantias Cidadãs</option>
+        <option>Departamento de Urbanismo</option>
+        <option>Departamento de Infraestrutura</option>
+        <option>Departamento de Gestão Administrativa</option>
+        <option>Departamento de Gestão Administrativa</option>
+        <option>Departamento de Gestão Administrativa</option>
+        <option>Departamento de Educação Infantil</option>
+        <option>Departamento de Ensino Fundamental</option>
+        <option>Departamento de Programas e Projetos</option>
+        <option>Departamento de Alimentação Escolar</option>
+        <option>Departamento de Cultura</option>
+        <option>Departamento de Incentivo ao Turismo</option>
+        <option>Departamento de Planejamento de Políticas Públicas, Culturais e Turísticas</option>
+        <option>Departamento de Equipamentos Esportivos</option>
+        <option>Departamento de Projetos Esportivos</option>
+        <option>Departamento de Formação e Rendimento</option>
+        <option>Departamento de Atividades Físicas (Recreação e Lazer)</option>
+        <option>E M DE ENSINO FUNDAMENTAL JOSE BEZERRA SANCHES PREFEITO</option>
+        <option>E M DE ENSINO FUNDAMENTAL MACHADO DE ASSIS</option>
+        <option>E M DE ENSINO FUNDAMENTAL DOUTOR FRANCISCO MORATO</option>
+        <option>E M DE ENSINO FUNDAMENTAL ANISIO SPINOLA TEIXEIRA</option>
+        <option>E M DE ENSINO FUNDAMENTAL BRIGADEIRO ROBERTO BRANDINI</option>
+        <option>E M DE ENSINO FUNDAMENTAL CARLOS DRUMMOND DE ANDRADE</option>
+        <option>E M DE ENSINO FUNDAMENTAL VANDA TERESINHA NALIN</option>
+        <option>E M DE ENSINO FUNDAMENTAL EGON SCHADEN</option>
+        <option>E M DE ENSINO FUNDAMENTAL ULISSES SILVEIRA GUIMARAES</option>
+        <option>E M DE ENSINO FUNDAMENTAL PROF. SANDRA REGINA</option>
+        <option>E M DE ENSINO FUNDAMENTAL ELBA NOBREGA SOBRAL</option>
+        <option>E M DE ENSINO FUNDAMENTAL RADIALISTA JAIME GONÇALVES</option>
+        <option>E M DE ENSINO FUNDAMENTAL PROF. LAIRCE LUPIANHA</option>
+        <option>E M DE ENSINO FUNDAMENTAL PROF TANIA FERNANDES</option>
+        <option>E M DE ENSINO FUNDAMENTAL ERICO VERISSIMO</option>
+        <option>E M DE ENSINO FUNDAMENTAL PAULO FREIRE</option>
+        <option>E M DE ENSINO FUNDAMENTAL PADRE LUIZ SERGIO</option>
+        <option>E M DE ENSINO FUNDAMENTAL FANNY GOLDBERG</option>
+        <option>E M DE ENSINO FUNDAMENTAL GIULIANO CECCHETTINI</option>
+        <option>E M DE ENSINO FUNDAMENTAL ISABEL LUPIANHES ROMERA RYAN</option>
+        <option>E M DE ENSINO FUNDAMENTAL ALFREDO VOLPI</option>
+        <option>E M DE ENSINO FUNDAMENTAL PROF. ELIANE MARIA DE PAULA OLIVEIRA</option>
+        <option>E M DE ENSINO FUNDAMENTAL ALMEIDA JUNIOR</option>
+        <option>E M DE ENSINO FUNDAMENTAL VEREADOR AMADO PINTO</option>
+        <option>E M DE ENSINO FUNDAMENTAL ANITA MALFATTI</option>
+        <option>E M DE ENSINO FUNDAMENTAL ANTONIO FEDERZONI</option>
+        <option>E M DE ENSINO FUNDAMENTAL ANTONIO MUNIZ</option>
+        <option>E M DE ENSINO FUNDAMENTAL CANDIDO PORTINARI</option>
+        <option>E M DE ENSINO FUNDAMENTAL CASTRO ALVES</option>
+        <option>E M DE ENSINO FUNDAMENTAL CLARICE LISPECTOR</option>
+        <option>E M DE ENSINO FUNDAMENTAL EDITE PEREIRA</option>
+        <option>E M DE ENSINO FUNDAMENTAL FERNANDO PESSOA</option>
+        <option>E M DE ENSINO FUNDAMENTAL GRACILIANO RAMOS</option>
+        <option>E M DE ENSINO FUNDAMENTAL JOAO GUIMARAES ROSA</option>
+        <option>E M DE ENSINO FUNDAMENTAL LEONARDO DA VINCI</option>
+        <option>E M DE ENSINO FUNDAMENTAL LIMA BARRETO</option>
+        <option>E M DE ENSINO FUNDAMENTAL MONTEIRO LOBATO</option>
+        <option>E M DE ENSINO FUNDAMENTAL OLAVO BILAC</option>
+        <option>E M DE ENSINO FUNDAMENTAL PROF. SONIA REGINA F. DE OLIVEIRA</option>
+        <option>E M DE ENSINO FUNDAMENTAL VINICIUS DE MORAES</option>
+        <option>E M DE ENSINO FUNDAMENTAL RUTH ROCHA</option>
+        <option>E M DE ENSINO FUNDAMENTAL TARSILA DO AMARAL</option>
+        <option>E M DE ENSINO FUNDAMENTAL TATIANA BELINK</option>
+        <option>E M DE ENSINO FUNDAMENTAL ZELIA GATTAI</option>
+        <option>E M DE ENSINO FUNDAMENTAL ANTONIO PACHECO DO NASCIMENTO</option>
+        <option>E M DE ENSINO FUNDAMENTAL CORA CORALINA</option>
+        <option>E M DE ENSINO FUNDAMENTAL PROF. HELY MARA DA SILVA</option>
+        <option>E M DE ENSINO FUNDAMENTAL VEREADOR HEITOR HARTMANN</option>
+        <option>E M DE ENSINO FUNDAMENTAL PROF HOSUE MORITA AOKI</option>
+        <option>CRAS JARDIM ALEGRIA/ REGIONAL JD ALEGRIA</option>
+        <option>CRAS 120</option>
+        <option>CRAS SANTO ANTONIO</option>
+        <option>CENTRO POP</option>
+        <option>CENTRO SOCIAL URBANO / ESPORTES</option>
+        <option>CREAS</option>
+        <option>FUNDO SOCIAL DE SOLIDARIEDADE</option>
+        <option>UNID. POLO DE FORMAÇÃO</option>
+        <option>CARTÓRIO ELEITORAL 367</option>
+        <option>CRAS VASSOURAS II</option>
+        <option>ARQUIVO MORTO / PATRIMÔNIO</option>
+        <option>CRAS BELEM ESTAÇÃO</option>
+        <option>ALMOXARIFADO CENTRAL</option>
+        <option>PROCON</option>
+        <option>GARAGEM OFICINA</option>
+        <option>CONSELHO TUTELAR II</option>
+        <option>SECRETARIA DA CULTURA</option>
+        <option>DELEGACIA DA MULHER</option>
+        <option>UNIVESP - LABORATORIO DE INFORMATICA VL HELOISA</option>
+        <option>AUDITÓRIO LAURA BRESSANE</option>
+        <option>IBGE</option>
+        <option>FUSBEMO</option>
+        <option>USF DO AGUA VERMELHA</option>
+        <option>USF CASA GRANDE</option>
+        <option>USF DR WALFRIDO TIBURCIO</option>
+        <option>USF DO ARPOADOR</option>
+        <option>USF DO JARDIM NOVA ESPERANÇA</option>
+        <option>USF DO JARDIM ROSAS</option>
+        <option>USF DO JARDIM SILVIA</option>
+        <option>USF DO PARQUE PAULISTA</option>
+        <option>USF DO JARDIM SANTO ANTONIO</option>
+        <option>USF TEREZINHA MARQUES DA SILVA</option>
+        <option>USF VILA GUILHERME</option>
+        <option>USF JD BATISTA GENARI</option>
+        <option>USF DO PQ 120</option>
+        <option>USF DO JARDIM NOVA ESPERANÇA</option>
+        <option>Vigilância Sanitária</option>
+        <option>Almoxarifado - SAME</option>
+        <option>Farmacia central</option>
+        <option>Caps II Centro</option>
+        <option>Transportes</option>
+        <option>Caps Infantil</option>
+        <option>CEO - Centro Odontologia</option>
+        <option>CAPS AD Ana Marques</option>
+        <option>C.T.A</option>
+        <option>Ambulatório</option>
+        <option>Fisioterapia</option>
+        <option>Casa da Mulher</option>
+        <option>Departamento de Compras</option>
+        <option>Núcleo de Atendimento às Vítimas de Violência</option>
+        <option>Departamento De Execução Fiscal</option>
+        <option>Departamento de Contabilidade</option>
+        <option>Oficina Pedagogica</option>
+        <option>RH-SAME</option>
+        <option>Programas e Projetos</option>
+        <option>Departamento de Cadastro</option>
+        <option>Departamento de Vida Escolar</option>
+        <option>Secretaria de Segurança Cidadã</option>
+        <option>Departamento de Protocolo</option>
+        <option>Departamento de Atenção Básica</option>
+        <option>Financeiro - SAME</option>
+        <option>Departamento de ISS</option>
+        <option>Receitas</option>
+        <option>Departamento de Políticas Públicas Setoriais e de Direitos, Programas e Projetos.</option>
+        <option>STARTUP</option>
+        <option>Supervisão Educação</option>
+        <option>E M DE ENSINO FUNDAMENTAL MARCO AURÉLIO DOMINGOS MAGOGA</option>
+        <option>Transporte Escolar</option>
+        <option>AMEM</option>
+        <option>LGBTQIA+</option>
+        <option>SEBRAE - Serviço Brasileiro de Apoio às Micro e Pequenas Empresas</option>
+        <option>Casa Afro</option>
+        <option>E M de Ensino Infantil Jorge Tertuliano Rizzi</option>
+        <option>RH - Educação</option>
+        <option>GALPÃO PROGRESSO</option>
+        <option>E M de Ensino Infantil Vereador Pastor Jorge Gabriel Rodrigues</option>
+        <option>BOLSA FAMILIA</option>
+        <option>CONSELHO TUTELAR</option>
+        <option>Zoonoses</option>
+        <option>UPA</option>
+        <option>Junta Militar de Fco. Morato</option>
+        <option>Gabinete da Educação</option>
+        <option>Gabinete Assistência e Desenvolvimento Social</option>
+        <option>Departamento de Compras - SAME</option>
+        <option>Departamento de Regulação - SAME</option>
+        <option>Gabinete do(a) Prefeito(a)</option>
+        <option>Secretaria de Esportes</option>
+        <option>E M ALAIN DOS SANTOS GOMES</option>
+        <option>Departamento de T.I. - SAME</option>
+        <option>FROTA ESCOLAR</option>
+        <option>Parque Da Criança - Esporte e Lazer</option>
+        <option>Departamento de Gestão Financeira - CONCENTRADOR</option>
+        <option>WIFI-PUBLICO SANTO ANTONIO</option>
+        <option>WIFI-PUBLICO JARDIM ALEGRIA</option>
+        <option>WIFI-PUBLICO JARDIM ROSAS / SANTA CASA</option>
+        <option>WIFI-PUBLICO CASA GRANDE</option>
+        <option>WIFI-PUBLICO TERMINAL LESTE</option>
+        <option>WIFI-PUBLICO TERMINAL OESTE</option>
+        <option>WIFI-PUBLICO REGIAO CENTRAL I / TRAVESSA BOULEVARD</option>
+        <option>WIFI-PUBLICO CSU</option>
+        <option>WIFI-PUBLICO PRACA BELEM DA SERRA</option>
+        <option>WIFI-PUBLICO PARQUE 120</option>
+        <option>WIFI-PUBLICO REGIAO CENTRAL II / PRACA CASSIANO PASSOS</option>
+        <option>WIFI-PUBLICO JARDIM VASSOURAS / MAGDALENA SHILLER</option>
+        <option>WIFI-PUBLICO REGIAO CENTRAL III / CIC</option>
+        <option>WIFI-PUBLICO PARQUE DA CRIANCA</option>
+        <option>QUADRA DE ESPORTES - EMEC</option>
+        <option>WIFI-PUBLICO CEU DAS ARTES</option>
+        <option>EM DE ENSINO INFANTIL ORDÁRIO DE SOUZA MARTINS</option>
+        <option>MERENDA ESCOLAR</option>
+        <option>Tesouraria</option>
+        <option>Departamento de Serviços On Line</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label><i data-lucide="user"></i> Responsável</label>
+      <input id="manager" placeholder="Nome do responsável" />
+    </div>
+
+    <div class="form-group">
+      <label><i data-lucide="credit-card"></i> Matrícula do Responsável</label>
+      <input id="matricula" placeholder="Nº matrícula" />
+    </div>
+
+    <fieldset class="full address-group">
+      <legend><i data-lucide="map-pin"></i> Endereço da Unidade</legend>
+      <div>
+          <label>Rua</label>
+          <input id="location_street" placeholder="Nome da rua" maxlength="80" />
+      </div>
+      <div>
+          <label>Número</label>
+          <input id="location_number" placeholder="Nº" maxlength="12" />
+      </div>
+      <div>
+          <label>Bairro</label>
+          <input id="location_neighborhood" placeholder="Nome do bairro" maxlength="60" />
+      </div>
+    </fieldset>
+
+    <div class="form-group full">
+      <label><i data-lucide="align-left"></i> Descrição</label>
+      <textarea id="desc" placeholder="Descrição do departamento..." rows="3"></textarea>
+    </div>
+
+    <div class="full controls">
+      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Salvar</button>
+      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="trash-2"></i> Limpar</button>
+      <button type="button" class="btn btn-secondary" id="exportBtn"><i data-lucide="download"></i> Exportar CSV</button>
+      <label class="import-area" id="importLabel"><i data-lucide="upload"></i> Importar CSV
+        <input id="importFile" type="file" accept="text/csv" />
+      </label>
+    </div>
+  </form>
+  </div>
+
+
+  <script>
+    const STORAGE_KEY = 'departments_v1'
+    const form = document.getElementById('deptForm')
+
+
+    function load(){
+      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }catch(e){return[]}
+    }
+    function save(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)) }
+
+
+    form.addEventListener('submit', e=>{
+      e.preventDefault()
+      const idx = document.getElementById('idx').value
+      const street = document.getElementById('location_street').value.trim()
+      const number = document.getElementById('location_number').value.trim()
+      const neighborhood = document.getElementById('location_neighborhood').value.trim()
+      const composedLocation = [street ? street : null, number ? number : null].filter(Boolean).join(', ') + (neighborhood ? ' - ' + neighborhood : '')
+      const item = {
+        code: document.getElementById('code').value.trim(),
+        name: document.getElementById('name').value.trim(),
+        manager: document.getElementById('manager').value.trim(),
+        matricula: document.getElementById('matricula').value.trim(),
+        location: composedLocation,
+        desc: document.getElementById('desc').value.trim()
+      }
+      if(!item.code){ alert('Informe o Código do departamento'); return }
+      const list = load()
+      if(idx==='') list.push(item); else list[Number(idx)] = item
+      save(list)
+      form.reset(); document.getElementById('idx').value = ''
+    })
+
+
+    document.getElementById('clearBtn').addEventListener('click', ()=>{ form.reset(); document.getElementById('idx').value = '' })
+
+    window.edit = function(i){
+      const list = load(); const d = list[i]; if(!d) return
+      document.getElementById('idx').value = i
+      document.getElementById('code').value = d.code || ''
+      document.getElementById('name').value = d.name || ''
+      document.getElementById('manager').value = d.manager || ''
+      document.getElementById('matricula').value = d.matricula || ''
+      if (d.location) {
+        const parts = d.location.split(' - ')
+        const addr = parts[0] || ''
+        const neighborhood = parts[1] || ''
+        const addrParts = addr.split(', ')
+        document.getElementById('location_street').value = addrParts[0] || ''
+        document.getElementById('location_number').value = addrParts[1] || ''
+        document.getElementById('location_neighborhood').value = neighborhood || ''
+      }
+      document.getElementById('desc').value = d.desc || ''
+      window.scrollTo({top:0,behavior:'smooth'})
+    }
+
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const list = load(); if(list.length===0){ alert('Nenhum dado para exportar'); return }
+      const header = ['code','name','manager','matricula','location','desc']
+      const rows = [header.join(',')].concat(list.map(r=>header.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')))
+      const csv = rows.join('\n')
+      const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'})
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'departamentos.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url)
+    })
+
+
+    document.getElementById('importFile').addEventListener('change', async e=>{
+      const f = e.target.files[0]; if(!f) return
+      const text = await f.text()
+      try{
+        const lines = text.split(/\r?\n/).filter(Boolean)
+        const header = lines.shift().split(/,/) .map(h=>h.replace(/(^"|"$)/g,''))
+        const list = lines.map(l=>{
+          const cols = l.match(/(?:\"([^\"]*)\"|([^,]*))(?:,|$)/g).map(c=>c.replace(/(^,|,$)/g,''))
+          const obj = {}
+          header.forEach((h,idx)=>{ obj[h.trim()] = (cols[idx]||'').replace(/^"|"$/g,'') })
+          return obj
+        })
+        const existing = load(); save(existing.concat(list)); e.target.value = ''
+      }catch(err){ alert('Falha ao importar CSV: formato inválido') }
+    })
+
+
+    if (typeof lucide !== 'undefined') lucide.createIcons()
+
+    // carregar edição vindo da lista
+    const editIdx = sessionStorage.getItem('editDeptIdx')
+    if(editIdx !== null){
+      sessionStorage.removeItem('editDeptIdx')
+      const list = load()
+      const d = list[Number(editIdx)]
+      if(d) window.edit(Number(editIdx))
+    }
+  </script>
+</body>
+</html>

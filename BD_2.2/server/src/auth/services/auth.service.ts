@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { findByLogin } from "./user.repo";
 import { mapearProfile, mapearRole } from "./profile.service";
+import { authenticateViaLdap, ldapConfigured } from "./ldap.service";
 import type { JwtPayload } from "../types";
 
 function makeToken(payload: Omit<JwtPayload, "iat" | "exp">): string {
@@ -31,7 +32,24 @@ export async function login(
     return { token: makeToken(userPayload), user: userPayload };
   }
 
-  // 2. Autenticação local contra a tabela usuarios (bcrypt).
+  // 2. Se o LDAP estiver configurado, ele é o provedor de login (não-admin).
+  if (ldapConfigured()) {
+    const result = await authenticateViaLdap(username, password);
+    if (!result.success) {
+      if (result.reason === "not_in_group") throw new Error("Sem permissão de acesso");
+      throw new Error("Credenciais inválidas");
+    }
+    const userPayload: Omit<JwtPayload, "iat" | "exp"> = {
+      sub: result.username,
+      nome: result.displayName,
+      matricula: result.matricula,
+      role: "fiscal",
+      profile: "fiscal",
+    };
+    return { token: makeToken(userPayload), user: userPayload };
+  }
+
+  // 3. Sem LDAP: autenticação local contra a tabela usuarios (bcrypt).
   const row = await findByLogin(username);
   if (!row) throw new Error("Credenciais inválidas");
 

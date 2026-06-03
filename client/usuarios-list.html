@@ -88,10 +88,9 @@
     <table id="userTable">
       <thead>
         <tr>
-          <th>Nome</th>
-          <th>E-mail</th>
-          <th>Departamento</th>
-          <th>Observação</th>
+          <th>Login</th>
+          <th>Funcionário</th>
+          <th>Tipo</th>
           <th style="width:120px">Ações</th>
         </tr>
       </thead>
@@ -100,37 +99,37 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'usuarios_v1'
     const tbody = document.querySelector('#userTable tbody')
 
-    function load(){
-      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }catch(e){return[]}
-    }
-    function save(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); render() }
-
-    function render(){
-      const list = load(); tbody.innerHTML = ''
-      const depts = JSON.parse(localStorage.getItem('departments_v1') || '[]')
-      const deptMap = {}
-      depts.forEach(d => { deptMap[d.code] = d.name })
-
-      if(list.length === 0){
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum usuário cadastrado.</td></tr>'
+    async function render(){
+      tbody.innerHTML = '<tr><td colspan="4" class="empty">Carregando...</td></tr>'
+      let list = [], funcionarios = []
+      try {
+        [list, funcionarios] = await Promise.all([
+          apiFetch('/api/usuarios').then(r => r.json()),
+          apiFetch('/api/funcionarios').then(r => r.json()),
+        ])
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty">Erro ao carregar dados.</td></tr>'
         return
       }
-
-      list.forEach((u,i)=>{
+      const funcNome = Object.fromEntries(funcionarios.map(f => [f.matricula, f.nome]))
+      tbody.innerHTML = ''
+      if(list.length === 0){
+        tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum usuário cadastrado.</td></tr>'
+        return
+      }
+      list.forEach(u=>{
         const tr = document.createElement('tr')
-        const nome = u.name || u["name completo"] || ''
+        const tipo = String(u.tipoUsuario) === '1' ? 'Administrador' : 'Comum'
+        const func = funcNome[u.funcionarios_matricula] || u.funcionarios_matricula || '—'
         tr.innerHTML = `
-          <td>${escapeHtml(nome)}</td>
-          <td>${escapeHtml(u.email)}</td>
-          <td>${escapeHtml(deptMap[u.dept] || u.dept || '')}</td>
-          <td>${escapeHtml(u.obs || u.secretaria || '')}</td>
+          <td>${escapeHtml(u.login)}</td>
+          <td>${escapeHtml(func)}</td>
+          <td>${escapeHtml(tipo)}</td>
           <td>
             <div class="actions">
-              <button class="btn-sm btn-edit" onclick="edit(${i})"><i data-lucide="edit-3"></i> Editar</button>
-              <button class="btn-sm btn-del" onclick="del(${i})"><i data-lucide="trash-2"></i> Remover</button>
+              <button class="btn-sm btn-del" onclick="del(${u.id})"><i data-lucide="trash-2"></i> Remover</button>
             </div>
           </td>
         `
@@ -139,14 +138,10 @@
       if (typeof lucide !== 'undefined') lucide.createIcons()
     }
 
-    window.edit = function(i){
-      sessionStorage.setItem('editUserIdx', i)
-      window.location.href = 'usuarios.html'
-    }
-
-    window.del = function(i){
+    window.del = async function(id){
       if(!confirm('Remover este usuário?')) return
-      const list = load(); list.splice(i,1); save(list)
+      try { await apiFetch('/api/usuarios/' + id, { method: 'DELETE' }); render() }
+      catch (e) { alert('Falha ao remover.') }
     }
 
     render()

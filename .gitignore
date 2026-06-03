@@ -1,0 +1,4 @@
+.env
+node_modules/
+BD_2.2/server/node_modules/
+BD_2.2/server/dist/

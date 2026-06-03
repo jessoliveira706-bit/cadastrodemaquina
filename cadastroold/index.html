@@ -118,6 +118,7 @@
 
     function updateCharts(){
       const calls = JSON.parse(localStorage.getItem('calls_v1') || '[]')
+      const machines = JSON.parse(localStorage.getItem('machines_alocadas_v1') || '[]')
 
       const callStatus = {
         Aguardando: calls.filter(c=>c.status==='Aguardando').length,
@@ -125,9 +126,18 @@
         Entregue: calls.filter(c=>c.status==='Entregue').length,
       }
 
+      const machineStatus = {
+        Alocada: machines.filter(m=>m.status==='Alocada').length,
+        Disponível: machines.filter(m=>m.status==='Disponível').length,
+        Manutenção: machines.filter(m=>m.status==='Manutenção').length,
+        Devolução: machines.filter(m=>m.status==='Devolução').length,
+      }
+
       const colors = ['#3b82f6','#ef4444','#22c55e']
+      const colorsM = ['#6366f1','#14b8a6','#f97316','#a855f7']
 
       if(chartCalls) chartCalls.destroy()
+      if(chartMachines) chartMachines.destroy()
 
       const ctx1 = document.getElementById('chart-calls')
       if(ctx1){
@@ -150,34 +160,31 @@
         })
       }
 
-    }
-
-    // Gráfico de Máquinas: vem do banco (equipamentos agrupados por status).
-    async function updateMachineChart(){
       const ctx2 = document.getElementById('chart-machines')
-      if(!ctx2) return
-      let equips = [], status = []
-      try {
-        [equips, status] = await Promise.all([
-          apiFetch('/api/equipamentos').then(r=>r.json()),
-          apiFetch('/api/status').then(r=>r.json()),
-        ])
-      } catch(e){ return }
-      const labels = status.map(s=>s.nome)
-      const counts = status.map(s=> equips.filter(e=>e.status_id===s.id).length)
-      if(chartMachines) chartMachines.destroy()
-      chartMachines = new Chart(ctx2, {
-        type: 'bar',
-        data: { labels, datasets: [{ data: counts, backgroundColor: ['#6366f1','#14b8a6','#f97316','#a855f7','#ef4444'], borderRadius: 6, borderSkipped: false }] },
-        options: {
-          responsive: true, maintainAspectRatio: true,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11, family: 'Inter' } }, grid: { color: '#f1f5f9' } },
-            x: { ticks: { font: { size: 10, family: 'Inter' } } }
+      if(ctx2){
+        chartMachines = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(machineStatus),
+            datasets: [{
+              data: Object.values(machineStatus),
+              backgroundColor: colorsM,
+              borderRadius: 6,
+              borderSkipped: false,
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: true,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11, family: 'Inter' } }, grid: { color: '#f1f5f9' } },
+              x: { ticks: { font: { size: 10, family: 'Inter' } } }
+            }
           }
-        }
-      })
+        })
+      }
     }
 
     function renderKanban(){
@@ -195,7 +202,6 @@
     }
 
     updateCharts()
-    updateMachineChart()
     renderKanban()
     window.addEventListener('storage', ()=>{ updateCharts(); renderKanban() })
     if (typeof lucide !== 'undefined') lucide.createIcons()

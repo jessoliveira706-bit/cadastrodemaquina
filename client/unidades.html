@@ -6,7 +6,7 @@
   <title>Unidades - Cadastro</title>
   <style>
     * { box-sizing: border-box; }
-    body { max-width: 680px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    body { max-width: 880px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
     header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
     a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
     a.back:hover { opacity: 1; text-decoration: underline; }
@@ -14,58 +14,28 @@
     h1 svg { color: #188331; }
     p.muted { color: #64748b; font-size: 0.85rem; margin: -16px 0 20px; }
 
-    .form-card {
-      background: #fff; border-radius: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
-      padding: 28px 28px 20px; margin-bottom: 32px; border: 1px solid #f0f0f0;
-    }
-
-    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-    .form-group label {
-      font-size: 0.75rem; font-weight: 600; color: #475569;
-      text-transform: uppercase; letter-spacing: 0.04em;
-      display: flex; align-items: center; gap: 6px;
-    }
+    .form-card { background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); padding: 28px 28px 20px; margin-bottom: 32px; border: 1px solid #f0f0f0; }
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+    .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.75rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 6px; }
     .form-group label svg { width: 14px; height: 14px; color: #188331; flex-shrink: 0; }
-    .form-group select, .form-group input {
-      width: 100%; padding: 10px 14px;
-      border: 1.5px solid #e2e8f0; border-radius: 10px;
-      font-size: 0.9rem; font-family: inherit; color: #1e293b;
-      background: #f8fafc; outline: none;
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 0.9rem; font-family: inherit; color: #1e293b; background: #f8fafc; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .form-group select:focus, .form-group input:focus {
-      border-color: #188331;
-      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
-      background: #fff;
-    }
-
-    .fields-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px;
-      margin-top: 4px;
-    }
-    .fields-grid .full { grid-column: 1 / -1; }
-
-    .controls {
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-      margin-top: 4px; padding-top: 16px; border-top: 1.5px solid #e2e8f0;
-    }
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 18px; border: none; border-radius: 10px;
-      font-size: 0.82rem; font-weight: 600; font-family: inherit;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .btn svg { width: 16px; height: 16px; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #188331; box-shadow: 0 0 0 3px rgba(24,131,49,0.12); background: #fff; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .controls { grid-column: 1 / -1; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 6px; padding-top: 18px; border-top: 1.5px solid #e2e8f0; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+    .btn svg { width: 17px; height: 17px; }
     .btn-primary { background: #188331; color: #fff; }
     .btn-primary:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
     .btn-secondary { background: #e2e8f0; color: #475569; }
     .btn-secondary:hover { background: #cbd5e1; transform: translateY(-1px); }
-    .btn-danger { background: #fee2e2; color: #b91c1c; }
-    .btn-danger:hover { background: #fecaca; transform: translateY(-1px); }
-    .btn-success { background: #059669; color: #fff; }
-    .btn-success:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,150,105,0.25); }
     .btn:active { transform: scale(0.97); }
+    @media (max-width: 700px) { form { grid-template-columns: 1fr; } .full { grid-column: 1; } .controls { flex-direction: column; align-items: stretch; } }
   </style>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -88,118 +58,110 @@
     </nav>
   </div>
   <header>
-    <a class="back" href="index.html">← Voltar</a>
-    <h1><i data-lucide="building"></i> Cadastro de Unidade</h1>
+    <a class="back" href="unidades-list.html">← Voltar</a>
+    <h1 id="formTitle"><i data-lucide="building"></i> Nova Unidade</h1>
   </header>
-
-  <p class="muted">Cadastre ou edite uma unidade.</p>
+  <p class="muted">Localização vinculada a secretaria, município, bairro e rua.</p>
 
   <div class="form-card">
-      <div class="form-group">
-        <label><i data-lucide="building-2"></i> Unidade</label>
-        <input id="unitSelect" type="text" placeholder="Digite o nome da unidade" />
-      </div>
+  <form id="unitForm">
+    <input type="hidden" id="editId" />
 
-    <div class="fields-grid">
-      <div class="form-group" style="margin:0">
-        <label><i data-lucide="file-text"></i> Nome</label>
-        <input id="newUnit" placeholder="Nome da unidade" />
-      </div>
-      <div class="form-group" style="margin:0">
-        <label><i data-lucide="mail"></i> CEP</label>
-        <input id="unitCep" placeholder="CEP" maxlength="8" />
-      </div>
-      <div class="form-group full" style="margin:0">
-        <label><i data-lucide="map-pin"></i> Endereço</label>
-        <input id="unitAddress" placeholder="Endereço completo" />
-      </div>
-      <div class="form-group" style="margin:0">
-        <label><i data-lucide="phone"></i> Telefone</label>
-        <input id="unitPhone" placeholder="Telefone" />
-      </div>
+    <div class="form-group">
+      <label><i data-lucide="building-2"></i> Secretaria</label>
+      <select id="secretaria" data-rota="secretarias" required><option value="">-- selecione --</option></select>
+    </div>
+    <div class="form-group">
+      <label><i data-lucide="map"></i> Município</label>
+      <select id="municipio" data-rota="municipios" required><option value="">-- selecione --</option></select>
+    </div>
+    <div class="form-group">
+      <label><i data-lucide="map-pin"></i> Bairro</label>
+      <select id="bairro" data-rota="bairros" required><option value="">-- selecione --</option></select>
+    </div>
+    <div class="form-group">
+      <label><i data-lucide="signpost"></i> Rua</label>
+      <select id="rua" data-rota="ruas" required><option value="">-- selecione --</option></select>
+    </div>
+    <div class="form-group">
+      <label><i data-lucide="tag"></i> Nome</label>
+      <input id="nome" placeholder="Nome da unidade" required />
+    </div>
+    <div class="form-group">
+      <label><i data-lucide="phone"></i> Telefone</label>
+      <input id="telefone" placeholder="8 dígitos" maxlength="8" required />
+    </div>
+    <div class="form-group full">
+      <label><i data-lucide="align-left"></i> Descrição</label>
+      <textarea id="descricao" placeholder="Descrição da unidade..." rows="3"></textarea>
     </div>
 
-    <div class="controls">
-      <button class="btn btn-primary" id="saveBtn"><i data-lucide="save"></i> Salvar unidade</button>
-      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="trash-2"></i> Limpar</button>
+    <div class="full controls">
+      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Salvar</button>
+      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="x"></i> Limpar</button>
     </div>
+  </form>
   </div>
 
-
   <script>
-    const unitInput = document.getElementById('unitSelect')
-    const saveBtn = document.getElementById('saveBtn')
-    const clearBtn = document.getElementById('clearBtn')
-    const editNameInput = document.getElementById('newUnit')
+    const form = document.getElementById('unitForm')
+    const selects = ['secretaria','municipio','bairro','rua'].map(id => document.getElementById(id))
 
-    const UNITS_KEY = 'units_list_v1'
-    const SELECTED_KEY = 'selected_unit'
-
-    function loadUnits(){
-      try{
-        const v = JSON.parse(localStorage.getItem(UNITS_KEY))
-        if(!Array.isArray(v) || v.length===0) return []
-        if(typeof v[0] === 'string') return v.map(n=>({ name: n, address: '', cep: '', phone: '' }))
-        return v.map(u=>({ name: u.name||'', address: u.address||'', cep: u.cep||'', phone: u.phone||'' }))
-      }catch(e){ return [] }
+    async function carregarSelects(){
+      await Promise.all(selects.map(async sel => {
+        const itens = await apiFetch('/api/' + sel.dataset.rota).then(r => r.json())
+        for (const it of itens) {
+          const opt = document.createElement('option')
+          opt.value = it.id; opt.textContent = it.nome
+          sel.appendChild(opt)
+        }
+      }))
     }
-    function saveUnits(list){ localStorage.setItem(UNITS_KEY, JSON.stringify(list)) }
 
-    function syncInputs(){
-      const v = unitInput.value.trim()
-      if(!v) return
-      const list = loadUnits()
-      const obj = list.find(u=>u.name.toLowerCase()===v.toLowerCase())
-      if(obj){
-        editNameInput.value = obj.name
-        document.getElementById('unitCep').value = obj.cep
-        document.getElementById('unitAddress').value = obj.address
-        document.getElementById('unitPhone').value = obj.phone
-      } else {
-        editNameInput.value = v
+    async function carregarEdicao(){
+      const id = sessionStorage.getItem('editUnitId')
+      if (!id) return
+      sessionStorage.removeItem('editUnitId')
+      const u = await apiFetch('/api/unidades/' + id).then(r => r.json())
+      document.getElementById('editId').value = u.id
+      document.getElementById('secretaria').value = u.secretarias_id
+      document.getElementById('municipio').value = u.municipios_id
+      document.getElementById('bairro').value = u.bairros_id
+      document.getElementById('rua').value = u.ruas_id
+      document.getElementById('nome').value = u.nome || ''
+      document.getElementById('telefone').value = (u.telefone || '').trim()
+      document.getElementById('descricao').value = u.descricao || ''
+      document.getElementById('formTitle').innerHTML = '<i data-lucide="building"></i> Editar Unidade'
+      if (typeof lucide !== 'undefined') lucide.createIcons()
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault()
+      const editId = document.getElementById('editId').value
+      const body = {
+        secretarias_id: Number(document.getElementById('secretaria').value),
+        municipios_id: Number(document.getElementById('municipio').value),
+        bairros_id: Number(document.getElementById('bairro').value),
+        ruas_id: Number(document.getElementById('rua').value),
+        nome: document.getElementById('nome').value.trim(),
+        telefone: document.getElementById('telefone').value.trim(),
+        descricao: document.getElementById('descricao').value.trim(),
       }
-    }
-
-    unitInput.addEventListener('input', syncInputs)
-
-    saveBtn.addEventListener('click', ()=>{
-      const name = unitInput.value.trim()
-      if(!name){ alert('Digite o nome da unidade'); return }
-      const cep = document.getElementById('unitCep').value.trim()
-      const address = document.getElementById('unitAddress').value.trim()
-      const phone = document.getElementById('unitPhone').value.trim()
-      const list = loadUnits()
-
-      const idx = list.findIndex(u=>u.name.toLowerCase()===name.toLowerCase())
-      const obj = { name, address, cep, phone }
-      if(idx!==-1) list[idx] = obj
-      else list.push(obj)
-      saveUnits(list)
-      localStorage.setItem(SELECTED_KEY, name)
-      alert('Unidade salva: ' + name)
+      if (!body.nome || !body.telefone) { alert('Preencha os campos obrigatórios.'); return }
+      try {
+        if (editId) await apiFetch('/api/unidades/' + editId, { method: 'PUT', body: JSON.stringify(body) })
+        else await apiFetch('/api/unidades', { method: 'POST', body: JSON.stringify(body) })
+        window.location.href = 'unidades-list.html'
+      } catch (err) { alert('Falha ao salvar.') }
     })
 
-    clearBtn.addEventListener('click', ()=>{
-      unitInput.value = ''
-      document.getElementById('unitCep').value = ''
-      document.getElementById('unitAddress').value = ''
-      document.getElementById('unitPhone').value = ''
-      editNameInput.value = ''
-      localStorage.removeItem(SELECTED_KEY)
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      form.reset(); document.getElementById('editId').value = ''
+      document.getElementById('formTitle').innerHTML = '<i data-lucide="building"></i> Nova Unidade'
+      if (typeof lucide !== 'undefined') lucide.createIcons()
     })
 
-    const editIdx = sessionStorage.getItem('editUnitIdx')
-    if(editIdx !== null){
-      sessionStorage.removeItem('editUnitIdx')
-      const list = loadUnits()
-      const u = list[Number(editIdx)]
-      if(u){
-        unitInput.value = u.name
-        syncInputs()
-        window.scrollTo({top:0,behavior:'smooth'})
-      }
-    }
-
+    ;(async () => { try { await carregarSelects(); await carregarEdicao() } catch (e) {} })()
     if (typeof lucide !== 'undefined') lucide.createIcons()
   </script>
 </body>

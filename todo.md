@@ -19,70 +19,82 @@ A ideia é **estender esse mesmo backend** com rotas de dados e plugar as telas.
 
 ---
 
-## Fase 1 — Camada de acesso ao banco (Node, reaproveitando o `pool`)
-Arquivo novo: `BD_2.2/server/src/db/crud.ts`
-- [ ] Reutilizar o `pool` de `src/db/pool.ts`.
-- [ ] Criar helpers genéricos para todas as tabelas usarem (modo protótipo, simples):
-  - [ ] `listar(tabela, colunas)` → `SELECT ... FROM "tabelasInventarioMaquina".<tabela>`
-  - [ ] `obter(tabela, pk, valor)` → `SELECT ... WHERE <pk> = $1`
-  - [ ] `inserir(tabela, objeto)` → monta `INSERT (...) VALUES (...)` a partir das chaves
-  - [ ] `atualizar(tabela, pk, valor, objeto)` → `UPDATE ... SET ... WHERE <pk> = $n`
-  - [ ] `remover(tabela, pk, valor)` → `DELETE ... WHERE <pk> = $1`
-- [ ] **Atenção a CHAR(n)** (`equipamentos.patrimonio`, `funcionarios.matricula`,
-      `usuarios.login`): aplicar `TRIM()` na leitura para não vir com espaços.
-- [ ] **Bit** (`usuarios."tipoUsuario"`): tratar como string `"0"/"1"`.
-- [ ] Sempre prefixar o schema: `"tabelasInventarioMaquina"`.
+## Fase 1 — Camada de acesso ao banco (Node, reaproveitando o `pool`) ✅
+Arquivo: `BD_2.2/server/src/db/crud.ts` (criado e testado contra o Postgres).
+- [x] Reutilizar o `pool` de `src/db/pool.ts`.
+- [x] Helpers genéricos: `listar`, `obter`, `inserir`, `atualizar`, `remover`
+      (+ `proximoId` para PKs `integer` como `usuarios`).
+- [x] **CHAR(n)**: rtrim genérico em JS na leitura (`trimRow`) — cobre `matricula`,
+      `patrimonio`, `login` sem precisar saber o tipo de cada coluna.
+- [x] **Bit** (`usuarios."tipoUsuario"`): volta como string `"0"/"1"` (já tratado no auth).
+- [x] Schema sempre prefixado (`"tabelasInventarioMaquina"`); identificadores
+      validados por `ident()` e valores parametrizados (`$1, $2, ...`).
+- [x] Smoke test ok: listar(status), inserir/obter/atualizar/remover(departamentos), proximoId(usuarios).
 
-## Fase 2 — Rotas REST de dados (mesmo padrão das rotas de auth)
-Arquivo novo: `BD_2.2/server/src/data/data.routes.ts` (um `createDataRouter()`)
-- [ ] Montar no `index.ts`: `app.use("/api", authRequired, createDataRouter())`
-      (todas as rotas de dados exigem token — reaproveita o middleware de auth).
-- [ ] Criar CRUD para as entidades das telas existentes:
-  - [ ] **Departamentos** (`departamentos`): GET lista, GET :id, POST, PUT :id, DELETE :id
-  - [ ] **Unidades** (`unidades`): idem
-  - [ ] **Equipamentos/Máquinas** (`equipamentos`, PK = `patrimonio`): idem
-  - [ ] **Funcionários** (`funcionarios`, PK = `matricula`): idem
-  - [ ] **Usuários** (`usuarios`): GET lista (sem `senhaHash`), POST (gerar hash bcrypt
-        no servidor e `id = MAX(id)+1`, pois a coluna é `integer`, não `serial`)
-- [ ] Rotas só-leitura de apoio (para preencher selects das telas):
-  - [ ] `status`, `tipos`, `secretarias`, `municipios`, `bairros`, `ruas`
-- [ ] (Opcional) **Fila/Chamados**: não há tabela direta. Para o protótipo, ou
-      modelar via `movimentacoes` (equipamento + status + data), ou deixar a fila
-      ainda em `localStorage` por enquanto.
+## Fase 2 — Rotas REST de dados (mesmo padrão das rotas de auth) ✅
+Arquivo: `BD_2.2/server/src/data/data.routes.ts` (`createDataRouter()`), montado e testado.
+- [x] Montado no `index.ts`: `app.use("/api", authRequired, createDataRouter())`
+      (as rotas `/api/auth` e `/api/health` são resolvidas antes, sem auth).
+- [x] CRUD genérico (`registrarRecurso`) para:
+  - [x] **Departamentos** (`departamentos`, pk `id`): GET, GET :id, POST, PUT, DELETE
+  - [x] **Unidades** (`unidades`, pk `id`): idem
+  - [x] **Equipamentos/Máquinas** (`equipamentos`, pk `patrimonio`): idem
+  - [x] **Funcionários** (`funcionarios`, pk `matricula`): idem
+  - [x] **Usuários** (`usuarios`): GET lista/by-id **sem `senhaHash`**, POST (bcrypt +
+        `proximoId` + cast `$::bit` no `tipoUsuario`), DELETE
+- [x] Rotas só-leitura de apoio: `status`, `tipos`, `secretarias`, `municipios`, `bairros`, `ruas`
+- [x] Testado E2E: 401 sem token; GET/POST/PUT/DELETE departamentos; POST usuários +
+      login do usuário criado (prova o hash); apoio (status) retornando o seed.
+- [ ] (Opcional) **Fila/Chamados**: sem tabela direta — modelar via `movimentacoes`
+      ou deixar em `localStorage` por enquanto.
 
-## Fase 3 — Seed mínimo para as telas funcionarem
-Editar `BD_2.2/db/init/02-seed.sql`
-- [ ] Garantir ao menos 1 linha em cada tabela de apoio usada nos selects
-      (`status`, `tipos`, `secretarias`, e a cadeia `municipios→bairros→ruas` para `unidades`).
-- [ ] Lembrar: os scripts de init só rodam na 1ª criação do volume →
-      após editar, rodar `docker compose down -v && docker compose up --build`.
+## Fase 3 — Seed mínimo para as telas funcionarem ✅
+Arquivo: `BD_2.2/db/init/02-seed.sql` (ampliado e aplicado).
+- [x] `status` (3), `tipos` (2), `secretarias` (1), `departamentos` (1), `funcionarios` (1), `usuarios` (1).
+- [x] Cadeia de localização `municipios → bairros → ruas` + 1 `unidades` ("Sede").
+- [x] 1 `equipamentos` de exemplo (deixa a tela de Máquinas não-vazia).
+- [x] Aplicado com `down -v && up --build`; conferido via API (`/api/unidades`, `/api/equipamentos`, etc.).
 
-## Fase 4 — Plugar o frontend (trocar `localStorage` por `apiFetch`)
-Para **cada** tela, substituir `loadData/saveData` (localStorage) por chamadas à API.
-Já existe `apiFetch()` em `utils.js` (injeta `Bearer`, redireciona em 401).
-- [ ] **Departamentos** — `departments-list.html` (listar) e `departments.html` (criar/editar):
-  - [ ] `load()` → `await apiFetch('/api/departamentos').then(r=>r.json())`
-  - [ ] `save()` → `POST`/`PUT` para `/api/departamentos`
-  - [ ] deletar → `DELETE /api/departamentos/:id`
-- [ ] **Unidades** — `unidades-list.html` / `unidades.html` (mesmo padrão).
-- [ ] **Máquinas** — `machines.html` (usar `patrimonio` como id na URL).
-- [ ] **Usuários** — `usuarios-list.html` / `usuarios.html` (POST cria login no banco).
-- [ ] **Dashboard** — `index.html`: trocar as leituras `localStorage` dos gráficos
-      por `GET` nas rotas correspondentes (contagens de máquinas/chamados).
-- [ ] Preencher os `<select>` (departamento, status, tipo, unidade) a partir das
-      rotas de apoio em vez de valores fixos.
+> **Frontend movido para `client/`** (os `.html` + `styles.css` + `utils.js` + logo saíram
+> da raiz). Dockerfile, compose dev e o fallback do `index.ts` já apontam para `client/`.
 
-## Fase 5 — Rodar e verificar (end-to-end)
-- [ ] `cd BD_2.2 && docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`
-      (dev = hot reload ao editar o backend).
-- [ ] Logar em `http://localhost:3001/login.html` (`fiscal`/`fiscal123` ou `admin`).
-- [ ] Testar uma rota nova com token, ex.:
-      `curl localhost:3001/api/departamentos -H "Authorization: Bearer <token>"`.
-- [ ] Criar um departamento pela tela → recarregar → confirmar que **persistiu no
-      Postgres** (não no navegador). Conferir no banco:
-      `docker compose exec db psql -U inventario -d inventario -c
-      'SET search_path TO "tabelasInventarioMaquina"; SELECT * FROM departamentos;'`
-- [ ] Repetir o ciclo criar/editar/excluir nas demais telas.
+## Fase 4 — Plugar o frontend (trocar `localStorage` por `apiFetch`) ✅
+Todas as telas (em `client/`) passaram a usar a API. Os forms foram simplificados
+para casar com as colunas reais do schema (vários campos antigos não existiam no DB).
+- [x] **Departamentos** — `departments-list.html` (lista + secretaria resolvida) e
+      `departments.html` (select de secretaria + nome + descrição); POST/PUT/DELETE.
+- [x] **Unidades** — `unidades-list.html` / `unidades.html` com selects de
+      secretaria/município/bairro/rua + nome/telefone/descrição.
+- [x] **Máquinas** — `machines.html` (lista + form combinados); `patrimonio` como id,
+      selects de tipo/status/departamento/unidade/funcionário; **CSV removido** (fora de escopo).
+- [x] **Usuários** — `usuarios-list.html` (login/funcionário/tipo) e `usuarios.html`
+      (select de funcionário + login/senha/tipo); POST cria com hash no servidor, DELETE.
+- [x] **Dashboard** — `index.html`: gráfico de Máquinas agora vem de
+      `/api/equipamentos` + `/api/status` (Chamados segue em `localStorage`).
+- [x] `<select>` preenchidos pelas rotas de apoio (não mais valores fixos).
+- [x] Verificado: páginas servidas 200; payloads de POST/PUT de cada entidade
+      aceitos pela API; estado limpo ao final.
+- [ ] (Fila/Chamados continua em `localStorage` — sem tabela; fora do mínimo.)
+
+## Fase 5 — Rodar e verificar (end-to-end) ✅
+- [x] Stack no ar (modo dev, raiz do projeto): `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`.
+- [x] Login emitindo JWT; guarda de rota (sem token → 401).
+- [x] **E2E verificado com persistência conferida no Postgres (`psql`)**:
+      criar/editar/excluir Departamento, Unidade, Equipamento e Usuário via os
+      payloads reais dos forms; usuário criado consegue logar (bcrypt no servidor);
+      estado volta ao seed ao final.
+- [x] Checagem estática: nenhuma tela usa mais `localStorage` para dados; todas
+      chamam `apiFetch` nas rotas certas.
+- [ ] **Pendente (manual):** clicar de fato no navegador em
+      `http://localhost:3001/login.html` (`fiscal`/`fiscal123`) — o caminho de dados
+      já está 100% provado via HTTP+psql; falta só a validação visual/DOM.
+
+---
+
+## ✔ Resumo — protótipo mínimo (auth + banco) COMPLETO
+Fases 0–5 concluídas. Autenticação JWT (admin-fallback + login DB com bcrypt),
+backend Node dockerizado (`BD_2.2/server`), CRUD REST protegido sobre o schema
+`tabelasInventarioMaquina`, e o frontend (`client/`) plugado via `apiFetch`.
 
 ---
 

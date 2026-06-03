@@ -14,51 +14,22 @@
     h1 svg { color: #188331; }
     p.muted { color: #64748b; font-size: 0.85rem; margin: -16px 0 20px; }
 
-    .form-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
-      padding: 28px 28px 16px;
-      margin-bottom: 28px;
-      border: 1px solid #f0f0f0;
-    }
-
+    .form-card { background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); padding: 28px 28px 16px; margin-bottom: 28px; border: 1px solid #f0f0f0; }
     form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px 20px; }
     .full { grid-column: 1 / -1; }
     .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .form-group label {
-      font-size: 0.7rem; font-weight: 600; color: #475569;
-      text-transform: uppercase; letter-spacing: 0.04em;
-      display: flex; align-items: center; gap: 5px;
-    }
+    .form-group label { font-size: 0.7rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 5px; }
     .form-group label svg { width: 13px; height: 13px; color: #188331; flex-shrink: 0; }
-    .form-group input,
-    .form-group select {
-      width: 100%; padding: 9px 12px;
-      border: 1.5px solid #e2e8f0; border-radius: 10px;
-      font-size: 0.85rem; font-family: inherit; color: #1e293b;
-      background: #f8fafc; outline: none;
+    .form-group input, .form-group select {
+      width: 100%; padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-size: 0.85rem; font-family: inherit; color: #1e293b; background: #f8fafc; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .form-group input:focus,
-    .form-group select:focus {
-      border-color: #188331;
-      box-shadow: 0 0 0 3px rgba(24,131,49,0.12);
-      background: #fff;
-    }
-    input#tag { max-width: 180px; }
+    .form-group input:focus, .form-group select:focus { border-color: #188331; box-shadow: 0 0 0 3px rgba(24,131,49,0.12); background: #fff; }
+    .form-group input:read-only { background: #eef2f6; color: #64748b; }
 
-    .controls {
-      grid-column: 1 / -1;
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-      margin-top: 4px; padding-top: 16px; border-top: 1.5px solid #e2e8f0;
-    }
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 18px; border: none; border-radius: 10px;
-      font-size: 0.82rem; font-weight: 600; font-family: inherit;
-      cursor: pointer; transition: all 0.2s;
-    }
+    .controls { grid-column: 1 / -1; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px; padding-top: 16px; border-top: 1.5px solid #e2e8f0; }
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
     .btn svg { width: 16px; height: 16px; }
     .btn-primary { background: #188331; color: #fff; }
     .btn-primary:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
@@ -66,45 +37,16 @@
     .btn-secondary:hover { background: #cbd5e1; transform: translateY(-1px); }
     .btn-danger { background: #dc2626; color: #fff; }
     .btn-danger:hover { background: #b91c1c; transform: translateY(-1px); }
-    .btn-success { background: #059669; color: #fff; }
-    .btn-success:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,150,105,0.25); }
     .btn:active { transform: scale(0.97); }
+    .row-count { font-size: 0.82rem; color: #64748b; margin-left: auto; }
 
-    .import-area {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 18px; border-radius: 10px;
-      font-size: 0.82rem; font-weight: 600; font-family: inherit;
-      cursor: pointer; background: #f1f5f9; color: #475569;
-      border: 1.5px dashed #cbd5e1; transition: all 0.2s;
-      margin-left: auto;
-    }
-    .import-area:hover { background: #e2e8f0; border-color: #94a3b8; }
-    .import-area svg { width: 16px; height: 16px; }
-    input[type=file] { display: none; }
-    .row-count { font-size: 0.82rem; color: #64748b; margin-left: 8px; }
-
-    .table-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
-      border: 1px solid #f0f0f0;
-      overflow: hidden;
-      margin-bottom: 32px;
-    }
+    .table-card { background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; overflow: hidden; margin-bottom: 32px; }
     table { width: 100%; border-collapse: collapse; }
-    th {
-      background: #f8fafc;
-      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.04em; color: #475569;
-      padding: 12px 14px; text-align: left;
-      border-bottom: 1.5px solid #e2e8f0;
-    }
-    td {
-      padding: 11px 14px; font-size: 0.85rem;
-      border-bottom: 1px solid #f1f5f9; color: #334155;
-    }
+    th { background: #f8fafc; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #475569; padding: 12px 14px; text-align: left; border-bottom: 1.5px solid #e2e8f0; }
+    td { padding: 11px 14px; font-size: 0.85rem; border-bottom: 1px solid #f1f5f9; color: #334155; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #f8fafc; }
+    .empty { text-align: center; color: #94a3b8; padding: 32px; }
     .actions { display: flex; gap: 6px; }
     .actions .btn { padding: 6px 12px; font-size: 0.75rem; }
     .actions .btn svg { width: 14px; height: 14px; }
@@ -113,7 +55,6 @@
       form { grid-template-columns: 1fr; }
       .full { grid-column: 1; }
       .controls { flex-direction: column; align-items: stretch; }
-      .import-area { margin-left: 0; }
       th, td { padding: 8px 10px; font-size: 0.78rem; }
     }
   </style>
@@ -139,68 +80,46 @@
   </div>
   <header>
     <a class="back" href="index.html">← Voltar</a>
-    <h1>Cadastro de Máquinas Alocadas</h1>
+    <h1><i data-lucide="monitor"></i> Cadastro de Máquinas</h1>
   </header>
-  <p class="muted">Formulário para registrar, editar e exportar máquinas alocadas (dados salvos localmente).</p>
-
+  <p class="muted">Equipamentos vinculados a tipo, status, departamento, unidade e funcionário.</p>
 
   <div class="form-card">
   <form id="machineForm">
-    <input type="hidden" id="idx" />
+    <input type="hidden" id="editPatrimonio" />
 
     <div class="form-group">
       <label><i data-lucide="hash"></i> Patrimônio</label>
-      <input id="tag" placeholder="Ex: 12345" required />
+      <input id="patrimonio" placeholder="Ex: 000123" maxlength="6" required />
     </div>
-
     <div class="form-group">
-      <label><i data-lucide="monitor"></i> Tipo de máquina</label>
-      <input id="model" placeholder="Ex: Desktop, Notebook" />
+      <label><i data-lucide="monitor"></i> Tipo</label>
+      <select id="tipo" data-rota="tipos" required><option value="">--</option></select>
     </div>
-
-    <div class="form-group">
-      <label><i data-lucide="map-pin"></i> Departamento</label>
-      <input id="departamento" placeholder="Nome do departamento">
-    </div>
-
-    <div class="form-group">
-      <label><i data-lucide="building"></i> Unidade</label>
-      <input id="unidade" placeholder="Nome da unidade">
-    </div>
-
     <div class="form-group">
       <label><i data-lucide="circle"></i> Status</label>
-      <select id="status">
-        <option value="">-- selecione --</option>
-        <option value="Alocada">Alocada</option>
-        <option value="Disponível">Disponível</option>
-        <option value="Manutenção">Manutenção</option>
-        <option value="Devolução">Devolução</option>
-      </select>
+      <select id="status" data-rota="status" required><option value="">--</option></select>
     </div>
-
     <div class="form-group">
-      <label><i data-lucide="calendar"></i> Data de alocação</label>
-      <input id="date" type="date" />
+      <label><i data-lucide="folder"></i> Departamento</label>
+      <select id="departamento" data-rota="departamentos" required><option value="">--</option></select>
     </div>
-    
-     <div class="form-group">
-      <label><i data-lucide="calendar"></i> Data da devolução</label>
-      <input id="date_devolucao" type="date" />
-    </div> 
-
-      <div class="form-group">
-      <label><i data-lucide="align-left"></i> Descrição</label>
-      <input id="descricao" placeholder="Descrição da máquina">
+    <div class="form-group">
+      <label><i data-lucide="building"></i> Unidade</label>
+      <select id="unidade" data-rota="unidades" required><option value="">--</option></select>
+    </div>
+    <div class="form-group">
+      <label><i data-lucide="user"></i> Funcionário</label>
+      <select id="funcionario" required><option value="">--</option></select>
+    </div>
+    <div class="form-group full">
+      <label><i data-lucide="align-left"></i> Observação</label>
+      <input id="observacao" placeholder="Observação" />
     </div>
 
     <div class="full controls">
       <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Salvar</button>
-      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="trash-2"></i> Limpar</button>
-      <button type="button" class="btn btn-secondary" id="exportBtn"><i data-lucide="download"></i> Exportar CSV</button>
-      <label class="import-area" id="importLabel"><i data-lucide="upload"></i> Importar CSV
-        <input id="importFile" type="file" accept="text/csv" />
-      </label>
+      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="x"></i> Limpar</button>
       <span class="row-count" id="count">0 itens</span>
     </div>
   </form>
@@ -211,12 +130,12 @@
     <thead>
       <tr>
         <th>Patrimônio</th>
-        <th>Modelo</th>
-        <th>Localização</th>
+        <th>Tipo</th>
         <th>Status</th>
-        <th>Data alocação</th>
-        <th>Data devolução</th>
-        <th>Descrição</th>
+        <th>Departamento</th>
+        <th>Unidade</th>
+        <th>Funcionário</th>
+        <th>Observação</th>
         <th style="width:130px">Ações</th>
       </tr>
     </thead>
@@ -224,41 +143,73 @@
   </table>
   </div>
 
-
   <script>
-    const STORAGE_KEY = 'machines_alocadas_v1'
     const form = document.getElementById('machineForm')
     const tbody = document.querySelector('#machinesTable tbody')
     const countEl = document.getElementById('count')
 
+    // selects de apoio (value = id, label = nome) + funcionario (value = matricula)
+    const apoio = {
+      tipo: document.getElementById('tipo'),
+      status: document.getElementById('status'),
+      departamento: document.getElementById('departamento'),
+      unidade: document.getElementById('unidade'),
+    }
+    const selFunc = document.getElementById('funcionario')
 
-    function load(){
-      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }catch(e){return[]}
+    // mapas id->nome para a tabela
+    let maps = { tipos: {}, status: {}, departamentos: {}, unidades: {}, funcionarios: {} }
+
+    async function carregarApoio(){
+      const [tipos, status, departamentos, unidades, funcionarios] = await Promise.all([
+        apiFetch('/api/tipos').then(r => r.json()),
+        apiFetch('/api/status').then(r => r.json()),
+        apiFetch('/api/departamentos').then(r => r.json()),
+        apiFetch('/api/unidades').then(r => r.json()),
+        apiFetch('/api/funcionarios').then(r => r.json()),
+      ])
+      const fill = (sel, itens, value='id', label='nome') => {
+        for (const it of itens) {
+          const opt = document.createElement('option')
+          opt.value = it[value]; opt.textContent = it[label]
+          sel.appendChild(opt)
+        }
+      }
+      fill(apoio.tipo, tipos); fill(apoio.status, status)
+      fill(apoio.departamento, departamentos); fill(apoio.unidade, unidades)
+      for (const f of funcionarios) {
+        const opt = document.createElement('option')
+        opt.value = f.matricula; opt.textContent = `${f.nome} (${f.matricula})`
+        selFunc.appendChild(opt)
+      }
+      maps.tipos = Object.fromEntries(tipos.map(t => [t.id, t.nome]))
+      maps.status = Object.fromEntries(status.map(s => [s.id, s.nome]))
+      maps.departamentos = Object.fromEntries(departamentos.map(d => [d.id, d.nome]))
+      maps.unidades = Object.fromEntries(unidades.map(u => [u.id, u.nome]))
+      maps.funcionarios = Object.fromEntries(funcionarios.map(f => [f.matricula, f.nome]))
     }
 
-
-    function save(list){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
-      render()
-    }
-
-
-    function render(){
-      const list = load()
+    async function render(){
+      let list = []
+      try { list = await apiFetch('/api/equipamentos').then(r => r.json()) }
+      catch (e) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Erro ao carregar.</td></tr>'; return }
       tbody.innerHTML = ''
-      list.forEach((m, i)=>{
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty">Nenhuma máquina cadastrada.</td></tr>'
+      }
+      list.forEach(m => {
         const tr = document.createElement('tr')
         tr.innerHTML = `
-          <td>${escapeHtml(m.tag)}</td>
-          <td>${escapeHtml(m.model)}</td>
-          <td>${escapeHtml(m.location)}</td>
-          <td>${escapeHtml(m.status)}</td>
-          <td>${escapeHtml(m.date)}</td>
-          <td>${escapeHtml(m.date_devolucao || '')}</td>
-          <td>${escapeHtml(m.descricao || '')}</td>
+          <td>${escapeHtml(m.patrimonio)}</td>
+          <td>${escapeHtml(maps.tipos[m.tipos_id] || '—')}</td>
+          <td>${escapeHtml(maps.status[m.status_id] || '—')}</td>
+          <td>${escapeHtml(maps.departamentos[m.departamentos_id] || '—')}</td>
+          <td>${escapeHtml(maps.unidades[m.unidades_id] || '—')}</td>
+          <td>${escapeHtml(maps.funcionarios[m.funcionarios_matricula] || m.funcionarios_matricula || '—')}</td>
+          <td>${escapeHtml(m.observacao || '')}</td>
           <td class="actions">
-            <button class="btn btn-secondary" onclick="edit(${i})"><i data-lucide="pencil"></i> Editar</button>
-            <button class="btn btn-danger" onclick="del(${i})"><i data-lucide="trash-2"></i> Remover</button>
+            <button class="btn btn-secondary" onclick='edit(${JSON.stringify(m)})'><i data-lucide="pencil"></i> Editar</button>
+            <button class="btn btn-danger" onclick="del('${encodeURIComponent(m.patrimonio)}')"><i data-lucide="trash-2"></i> Remover</button>
           </td>
         `
         tbody.appendChild(tr)
@@ -267,95 +218,58 @@
       if (typeof lucide !== 'undefined') lucide.createIcons()
     }
 
-
-    form.addEventListener('submit', e=>{
+    form.addEventListener('submit', async e => {
       e.preventDefault()
-      const idx = document.getElementById('idx').value
-      const dept = document.getElementById('departamento').value.trim()
-      const unid = document.getElementById('unidade').value.trim()
-      const location = [dept, unid].filter(Boolean).join(' - ')
-      const item = {
-        tag: document.getElementById('tag').value.trim(),
-        model: document.getElementById('model').value.trim(),
-        departamento: dept,
-        unidade: unid,
-        location: location,
-        status: document.getElementById('status').value,
-        date: document.getElementById('date').value,
-        date_devolucao: document.getElementById('date_devolucao').value,
-        descricao: document.getElementById('descricao').value.trim()
+      const editPat = document.getElementById('editPatrimonio').value
+      const patrimonio = document.getElementById('patrimonio').value.trim()
+      const body = {
+        status_id: Number(apoio.status.value),
+        tipos_id: Number(apoio.tipo.value),
+        departamentos_id: Number(apoio.departamento.value),
+        funcionarios_matricula: selFunc.value,
+        unidades_id: Number(apoio.unidade.value),
+        observacao: document.getElementById('observacao').value.trim(),
       }
-      if(!item.tag){ alert('Informe a Tag / Patrimônio'); return }
-      const list = load()
-      if(idx===''){
-        list.push(item)
-      } else {
-        list[Number(idx)] = item
-      }
-      save(list)
+      if (!patrimonio || !body.tipos_id || !body.status_id) { alert('Preencha patrimônio, tipo e status.'); return }
+      try {
+        if (editPat) {
+          await apiFetch('/api/equipamentos/' + encodeURIComponent(editPat), { method: 'PUT', body: JSON.stringify(body) })
+        } else {
+          await apiFetch('/api/equipamentos', { method: 'POST', body: JSON.stringify({ patrimonio, ...body }) })
+        }
+        limpar(); render()
+      } catch (err) { alert('Falha ao salvar.') }
+    })
+
+    function limpar(){
       form.reset()
-      document.getElementById('idx').value = ''
-    })
+      document.getElementById('editPatrimonio').value = ''
+      document.getElementById('patrimonio').readOnly = false
+    }
+    document.getElementById('clearBtn').addEventListener('click', limpar)
 
-
-    document.getElementById('clearBtn').addEventListener('click', ()=>{ form.reset(); document.getElementById('idx').value=''; })
-
-
-    window.edit = function(i){
-      const list = load(); const m = list[i]
-      if(!m) return
-      document.getElementById('idx').value = i
-      document.getElementById('tag').value = m.tag || ''
-      document.getElementById('model').value = m.model || ''
-      document.getElementById('departamento').value = m.departamento || ''
-      document.getElementById('unidade').value = m.unidade || ''
-      document.getElementById('status').value = m.status || ''
-      document.getElementById('date').value = m.date || ''
-      document.getElementById('date_devolucao').value = m.date_devolucao || ''
-      document.getElementById('descricao').value = m.descricao || ''
-      window.scrollTo({top:0,behavior:'smooth'})
+    window.edit = function(m){
+      document.getElementById('editPatrimonio').value = m.patrimonio
+      const pat = document.getElementById('patrimonio')
+      pat.value = m.patrimonio; pat.readOnly = true
+      apoio.tipo.value = m.tipos_id
+      apoio.status.value = m.status_id
+      apoio.departamento.value = m.departamentos_id
+      apoio.unidade.value = m.unidades_id
+      selFunc.value = (m.funcionarios_matricula || '').trim()
+      document.getElementById('observacao').value = m.observacao || ''
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
-
-    window.del = function(i){
-      if(!confirm('Remover este registro?')) return
-      const list = load(); list.splice(i,1); save(list)
+    window.del = async function(patEnc){
+      if (!confirm('Remover este registro?')) return
+      try { await apiFetch('/api/equipamentos/' + patEnc, { method: 'DELETE' }); render() }
+      catch (e) { alert('Falha ao remover.') }
     }
 
-
-    document.getElementById('exportBtn').addEventListener('click', ()=>{
-      const list = load()
-      if(list.length===0){ alert('Nenhum dado para exportar'); return }
-      const header = ['tag','model','serial','owner','location','status','date']
-      const rows = [header.join(',')].concat(list.map(r=>header.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(',')))
-      const csv = rows.join('\n')
-      const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'})
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url; a.download = 'maquinas.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url)
-    })
-
-
-    document.getElementById('importFile').addEventListener('change', async e=>{
-      const f = e.target.files[0]; if(!f) return
-      const text = await f.text()
-      try{
-        const lines = text.split(/\r?\n/).filter(Boolean)
-        const header = lines.shift().split(/,/) .map(h=>h.replace(/(^"|"$)/g,''))
-        const list = lines.map(l=>{
-          const cols = l.match(/(?:\"([^\"]*)\"|([^,]*))(?:,|$)/g).map(c=>c.replace(/(^,|,$)/g,''))
-          const obj = {}
-          header.forEach((h,idx)=>{ obj[h.trim()] = (cols[idx]||'').replace(/^"|"$/g,'') })
-          return obj
-        })
-        const existing = load()
-        save(existing.concat(list))
-        e.target.value = ''
-      }catch(err){ alert('Falha ao importar CSV: formato inválido') }
-    })
-
-
-    render()
+    ;(async () => {
+      try { await carregarApoio(); await render() } catch (e) {}
+    })()
     if (typeof lucide !== 'undefined') lucide.createIcons()
   </script>
 </body>

@@ -1,0 +1,15 @@
+# Build context = raiz do projeto (a imagem da API copia backend + frontend).
+# Mantém: *.html, *.css, *.js, *.png (frontend) e BD_2.2/server/** (backend).
+**/node_modules
+.git
+.gitignore
+.env
+.env.example
+docker-compose*.yml
+auth-kit
+BD_2.2/db
+BD_2.2/*.jpg
+BD_2.2/*.drawio
+BD_2.2/*.pgerd
+*.md
+package-lock.json

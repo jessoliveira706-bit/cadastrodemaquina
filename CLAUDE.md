@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture — read this first
 
-The **domain** app is a set of **standalone static HTML pages** using **vanilla ES6+ JavaScript** and **`localStorage`** for all persistence (machines, queue, departments, units still live in the browser). Each `.html` page is self-contained: it inlines its own `<style>` and its own page `<script>`, and pulls CDN scripts (lucide icons, chart.js) plus the one shared local file `utils.js`.
+The **domain** app is a set of **standalone static HTML pages** (all under **`client/`**) using **vanilla ES6+ JavaScript** and **`localStorage`** for all persistence (machines, queue, departments, units still live in the browser). Each `.html` page is self-contained: it inlines its own `<style>` and its own page `<script>`, and pulls CDN scripts (lucide icons, chart.js) plus the one shared local file `client/utils.js`. Pages reference each other and assets by **relative filename** (e.g. `href="index.html"`, `src="utils.js"`), so they must stay in the same folder.
 
 **Authentication is real, however** — see the `BD_2.2/` backend below. `login.html` and `utils.js` now talk to an Express + JWT server instead of the old `localStorage` credential check.
 
@@ -16,7 +16,7 @@ The **domain** app is a set of **standalone static HTML pages** using **vanilla 
 
 ### Page structure
 
-Most entities follow a **list page + form page** pair, navigated via `window.location.href`:
+All pages live in `client/`. Most entities follow a **list page + form page** pair, navigated via `window.location.href`:
 
 - `index.html` — dashboard (chart.js doughnut + bar charts driven by localStorage)
 - `fila.html` — service queue kanban; `chamado.html` — single call form
@@ -24,7 +24,7 @@ Most entities follow a **list page + form page** pair, navigated via `window.loc
 - `departments-list.html` / `departments.html`
 - `unidades-list.html` / `unidades.html`
 - `usuarios-list.html` / `usuarios.html`
-- `login.html` — checks credentials against the `usuarios_v1` store, sets `user_initials`
+- `login.html` — POSTs to the auth backend (`/api/auth/login`), stores the JWT session (see the auth section), sets `user_initials`
 
 `utils.js` is loaded by every page and on `DOMContentLoaded` wires up the shared chrome: user avatar (`setUserAvatar`), active sidebar link highlighting (`highlightActiveLink`, matched by filename), and the logout button (`setupSair`). It also exposes shared `escapeHtml`, `loadData`, `saveData`.
 
@@ -66,9 +66,9 @@ Key facts when touching it:
 
 ## Running
 
-**Auth backend + full app (dockerized):** from `BD_2.2/`, `cp .env.example .env` then `docker compose up --build`. Open **http://localhost:3001/login.html**. The API serves the static frontend on the same origin. DB host port is mapped to **5433** (5432 is assumed busy locally). Seeded login: `fiscal` / `fiscal123`; admin-fallback: `admin` / value of `ADMIN_PASSWORD`.
+**Auth backend + full app (dockerized):** run **from the project root** — `cp .env.example .env` then `docker compose up --build`. Open **http://localhost:3001/login.html**. The compose files (`docker-compose.yml`, `docker-compose.dev.yml`) and `.env` live at the repo root; they reference the backend under `BD_2.2/` (build context = root, `dockerfile: BD_2.2/server/Dockerfile`). The image is **self-contained**: the Dockerfile copies both the backend and the static frontend (the `client/` folder) into `/frontend`, and the API serves it on the same origin (no CORS, `dotfiles:"ignore"` keeps `.env` unreachable). DB host port is mapped to **5433** (5432 is assumed busy locally). Seeded login: `fiscal` / `fiscal123`; admin-fallback: `admin` / value of `ADMIN_PASSWORD`.
 
-**Dev mode (hot reload in Docker):** `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`. The override (`docker-compose.dev.yml`) mounts `server/src` from the host and runs `tsx watch`, so saving a `.ts` file restarts the server in-container; it also sets `NODE_ENV=development` (enables the `DEV_TOKEN` bypass). `GET /api/health` returns `{ ok, db, mode }` — `mode` reflects `NODE_ENV`.
+**Dev mode (hot reload in Docker):** `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build`. The override mounts `BD_2.2/server/src` (and `client/` over `/frontend`) from the host and runs `tsx watch`, so saving a `.ts` file restarts the server in-container and frontend edits show up live; it also sets `NODE_ENV=development` (enables the `DEV_TOKEN` bypass). `GET /api/health` returns `{ ok, db, mode }` — `mode` reflects `NODE_ENV`.
 
 **Backend alone (no Docker):** from `BD_2.2/server/`, `npm install` then `npm run dev` (runs TS via `tsx`, no build step). Needs `JWT_SECRET` (+ `DB_*` or `DATABASE_URL` for DB login; without them only admin-fallback works).
 

@@ -3,6 +3,8 @@ import path from "node:path";
 import express from "express";
 import helmet from "helmet";
 import { createAuthRouter } from "./auth/routes/auth.routes";
+import { authRequired } from "./auth/middleware/auth";
+import { createDataRouter } from "./data/data.routes";
 import { dbEnabled } from "./db/pool";
 
 const app = express();
@@ -39,10 +41,14 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/auth", createAuthRouter());
 
+// Rotas de dados (todas exigem JWT). /api/auth e /api/health acima já foram
+// resolvidas antes deste middleware, então não passam pelo authRequired.
+app.use("/api", authRequired, createDataRouter());
+
 // Frontend estático (mesma origem → sem CORS). dotfiles:"ignore" protege .env.
 const frontendDir = process.env.FRONTEND_DIR
   ? path.resolve(process.env.FRONTEND_DIR)
-  : path.resolve(__dirname, "../../.."); // BD_2.2/server/src -> raiz do projeto
+  : path.resolve(__dirname, "../../../client"); // BD_2.2/server/src -> raiz/client
 
 app.use(express.static(frontendDir, { dotfiles: "ignore", extensions: ["html"] }));
 

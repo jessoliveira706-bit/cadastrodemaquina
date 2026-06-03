@@ -1,0 +1,17 @@
+# Override de desenvolvimento (rodar da RAIZ do projeto).
+# Uso: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+#  - NODE_ENV=development (habilita o bypass via DEV_TOKEN fora de produção)
+#  - roda `tsx watch` (hot reload ao salvar arquivos do backend)
+#  - monta o código do host por cima da imagem -> backend e frontend ao vivo
+services:
+  api:
+    environment:
+      NODE_ENV: development
+    command: ["npm", "run", "dev"]
+    volumes:
+      # Backend: só o código-fonte vem do host (node_modules fica na imagem).
+      - ./BD_2.2/server/src:/app/src
+      - ./BD_2.2/server/tsconfig.json:/app/tsconfig.json:ro
+      # Frontend ao vivo (na imagem ele é copiado; aqui sobrepomos com o host).
+      - ./client:/frontend:ro

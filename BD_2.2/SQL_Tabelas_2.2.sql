@@ -42,8 +42,10 @@ CREATE TABLE IF NOT EXISTS "tabelasInventarioMaquina".unidades
     bairros_id integer NOT NULL,
     ruas_id integer NOT NULL,
     nome character varying(100) NOT NULL,
-    telefone character(8) NOT NULL,
+    telefone character varying(20) NOT NULL,
     descricao character varying(255),
+    cep character(8),
+    endereco character varying(255),
     PRIMARY KEY (id)
 );
 
@@ -53,6 +55,12 @@ CREATE TABLE IF NOT EXISTS "tabelasInventarioMaquina".departamentos
     secretarias_id integer NOT NULL,
     nome character varying(100) NOT NULL,
     descricao character varying(255),
+    codigo character varying(20),
+    responsavel character varying(100),
+    responsavel_matricula character(6),
+    endereco_rua character varying(100),
+    endereco_numero character varying(12),
+    endereco_bairro character varying(60),
     PRIMARY KEY (id)
 );
 
@@ -91,17 +99,20 @@ CREATE TABLE IF NOT EXISTS "tabelasInventarioMaquina".equipamentos
     funcionarios_matricula character(6) NOT NULL,
     unidades_id integer NOT NULL,
     observacao character varying(255),
+    data_alocacao date,
+    data_devolucao date,
     PRIMARY KEY (patrimonio)
 );
 
 CREATE TABLE IF NOT EXISTS "tabelasInventarioMaquina".movimentacoes
 (
     id serial NOT NULL,
-    equipamentos_patrimonio character(6) NOT NULL,
+    equipamentos_patrimonio character varying(6) NOT NULL,
     status_id integer NOT NULL,
     departamentos_id integer NOT NULL,
     funcionarios_matricula character(6) NOT NULL,
     data date NOT NULL,
+    descricao character varying(255),
     PRIMARY KEY (id)
 );
 
@@ -112,6 +123,8 @@ CREATE TABLE IF NOT EXISTS "tabelasInventarioMaquina".usuarios
     "tipoUsuario" bit NOT NULL,
     login character(100) NOT NULL,
     "senhaHash" character(255) NOT NULL,
+    email character varying(100),
+    observacao character varying(255),
     PRIMARY KEY (id)
 );
 

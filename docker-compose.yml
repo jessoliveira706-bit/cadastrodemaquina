@@ -1,3 +1,7 @@
+# Suba a stack a partir da RAIZ do projeto:
+#   cp .env.example .env   (na primeira vez)
+#   docker compose up --build
+# App em http://localhost:3001/login.html
 services:
   db:
     image: postgres:16-alpine
@@ -8,9 +12,9 @@ services:
     volumes:
       - dbdata:/var/lib/postgresql/data
       # Scripts de inicialização (rodam só na 1ª criação do volume).
-      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./BD_2.2/db/init:/docker-entrypoint-initdb.d:ro
       # DDL original referenciado por 01-schema.sql (\i /sql/...).
-      - ./SQL_Tabelas_2.2.sql:/sql/SQL_Tabelas_2.2.sql:ro
+      - ./BD_2.2/SQL_Tabelas_2.2.sql:/sql/SQL_Tabelas_2.2.sql:ro
     ports:
       # Host 5433 -> container 5432 (evita conflito com Postgres local na 5432).
       - "5433:5432"
@@ -21,7 +25,10 @@ services:
       retries: 10
 
   api:
-    build: ./server
+    build:
+      # Context = raiz do projeto; a imagem copia backend + frontend.
+      context: .
+      dockerfile: BD_2.2/server/Dockerfile
     env_file: .env
     environment:
       DB_HOST: db
@@ -29,13 +36,9 @@ services:
       DB_NAME: ${DB_NAME:-inventario}
       DB_USER: ${DB_USER:-inventario}
       DB_PASSWORD: ${DB_PASSWORD:-inventario}
-      FRONTEND_DIR: /frontend
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      # Frontend estático (raiz do projeto) servido pela API na mesma origem.
-      - ..:/frontend:ro
     ports:
       - "3001:3001"
 

@@ -3,16 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Departamentos - Cadastro</title>
+  <title>Chamado - Cadastro</title>
   <style>
     * { box-sizing: border-box; }
-    body { max-width: 880px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    body { max-width: 680px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
     header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
     a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
     a.back:hover { opacity: 1; text-decoration: underline; }
     h1 { font-size: 1.35rem; font-weight: 700; margin: 0; color: #1e293b; display: flex; align-items: center; gap: 10px; }
     h1 svg { color: #188331; }
-    p.muted { color: #64748b; font-size: 0.85rem; margin: -16px 0 20px; }
 
     .form-card {
       background: #fff;
@@ -52,12 +51,12 @@
 
     .controls {
       grid-column: 1 / -1;
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-      margin-top: 6px; padding-top: 18px; border-top: 1.5px solid #e2e8f0;
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      margin-top: 4px; padding-top: 18px; border-top: 1.5px solid #e2e8f0;
     }
     .btn {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 20px; border: none; border-radius: 10px;
+      padding: 10px 22px; border: none; border-radius: 10px;
       font-size: 0.85rem; font-weight: 600; font-family: inherit;
       cursor: pointer; transition: all 0.2s;
     }
@@ -67,12 +66,6 @@
     .btn-secondary { background: #e2e8f0; color: #475569; }
     .btn-secondary:hover { background: #cbd5e1; transform: translateY(-1px); }
     .btn:active { transform: scale(0.97); }
-
-    @media (max-width: 700px) {
-      form { grid-template-columns: 1fr; }
-      .full { grid-column: 1; }
-      .controls { flex-direction: column; align-items: stretch; }
-    }
   </style>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -95,97 +88,84 @@
     </nav>
   </div>
   <header>
-    <a class="back" href="departments-list.html">← Voltar</a>
-    <h1 id="formTitle"><i data-lucide="folder"></i> Novo Departamento</h1>
+    <a class="back" href="fila.html">← Voltar</a>
+    <h1>Cadastro de Chamado</h1>
   </header>
-  <p class="muted">Os departamentos pertencem a uma secretaria.</p>
 
   <div class="form-card">
-  <form id="deptForm">
-    <input type="hidden" id="editId" />
+  <form id="callForm">
+    <input type="hidden" id="idx" />
 
     <div class="form-group">
-      <label><i data-lucide="building-2"></i> Secretaria</label>
-      <select id="secretaria" required>
-        <option value="">-- selecione --</option>
-      </select>
+      <label><i data-lucide="monitor"></i> Máquina</label>
+      <input id="machine" placeholder="Patrimônio ou nome da máquina" required />
     </div>
-
     <div class="form-group">
-      <label><i data-lucide="folder"></i> Nome do Departamento</label>
-      <input id="nome" placeholder="Nome do departamento" required />
+      <label><i data-lucide="folder"></i> Departamento</label>
+      <input id="dept" placeholder="Nome do departamento" />
     </div>
-
     <div class="form-group full">
       <label><i data-lucide="align-left"></i> Descrição</label>
-      <textarea id="descricao" placeholder="Descrição do departamento..." rows="3"></textarea>
+      <textarea id="desc" placeholder="Descreva o problema ou motivo do chamado..." rows="3"></textarea>
     </div>
-
+    <div class="form-group">
+      <label><i data-lucide="circle"></i> Status</label>
+      <select id="status">
+        <option value="Aguardando">Aguardando</option>
+        <option value="Em manutenção">Em manutenção</option>
+        <option value="Entregue">Entregue</option>
+      </select>
+    </div>
     <div class="full controls">
       <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Salvar</button>
-      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="x"></i> Limpar</button>
+      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="trash-2"></i> Limpar</button>
     </div>
   </form>
   </div>
 
   <script>
-    const form = document.getElementById('deptForm')
-    const sel = document.getElementById('secretaria')
+    const KEY = 'calls_v1'
+    const form = document.getElementById('callForm')
 
-    async function carregarSecretarias(){
-      const secs = await apiFetch('/api/secretarias').then(r => r.json())
-      for (const s of secs) {
-        const opt = document.createElement('option')
-        opt.value = s.id
-        opt.textContent = s.nome
-        sel.appendChild(opt)
-      }
+    function load(){
+      try{ return JSON.parse(localStorage.getItem(KEY) || '[]') }catch(e){return[]}
     }
+    function save(list){ localStorage.setItem(KEY, JSON.stringify(list)) }
 
-    async function carregarEdicao(){
-      const id = sessionStorage.getItem('editDeptId')
-      if (!id) return
-      sessionStorage.removeItem('editDeptId')
-      const d = await apiFetch('/api/departamentos/' + id).then(r => r.json())
-      document.getElementById('editId').value = d.id
-      sel.value = d.secretarias_id
-      document.getElementById('nome').value = d.nome || ''
-      document.getElementById('descricao').value = d.descricao || ''
-      document.getElementById('formTitle').innerHTML = '<i data-lucide="folder"></i> Editar Departamento'
-      if (typeof lucide !== 'undefined') lucide.createIcons()
-    }
-
-    form.addEventListener('submit', async e => {
+    form.addEventListener('submit', e => {
       e.preventDefault()
-      const editId = document.getElementById('editId').value
-      const body = {
-        secretarias_id: Number(sel.value),
-        nome: document.getElementById('nome').value.trim(),
-        descricao: document.getElementById('descricao').value.trim(),
+      const idx = document.getElementById('idx').value
+      const item = {
+        machine: document.getElementById('machine').value.trim(),
+        dept: document.getElementById('dept').value.trim(),
+        desc: document.getElementById('desc').value.trim(),
+        status: document.getElementById('status').value
       }
-      if (!body.secretarias_id || !body.nome) { alert('Informe a secretaria e o nome.'); return }
-      try {
-        if (editId) {
-          await apiFetch('/api/departamentos/' + editId, { method: 'PUT', body: JSON.stringify(body) })
-        } else {
-          await apiFetch('/api/departamentos', { method: 'POST', body: JSON.stringify(body) })
-        }
-        window.location.href = 'departments-list.html'
-      } catch (err) {
-        alert('Falha ao salvar.')
-      }
+      if(!item.machine){ alert('Informe a máquina'); return }
+      const list = load()
+      if(idx === '') list.push(item); else list[Number(idx)] = item
+      save(list)
+      form.reset(); document.getElementById('idx').value = ''
+      alert('Chamado salvo!')
     })
 
-    document.getElementById('clearBtn').addEventListener('click', () => {
-      form.reset(); document.getElementById('editId').value = ''
-      document.getElementById('formTitle').innerHTML = '<i data-lucide="folder"></i> Novo Departamento'
-      if (typeof lucide !== 'undefined') lucide.createIcons()
-    })
+    window.edit = function(i){
+      const list = load(); const c = list[i]; if(!c) return
+      document.getElementById('idx').value = i
+      document.getElementById('machine').value = c.machine
+      document.getElementById('dept').value = c.dept
+      document.getElementById('desc').value = c.desc
+      document.getElementById('status').value = c.status
+      window.scrollTo({top:0,behavior:'smooth'})
+    }
 
-    ;(async () => {
-      try { await carregarSecretarias(); await carregarEdicao() }
-      catch (e) { /* apiFetch já trata 401 */ }
-    })()
+    document.getElementById('clearBtn').addEventListener('click', () => { form.reset(); document.getElementById('idx').value = '' })
+
+    const editIdx = sessionStorage.getItem('editCallIdx')
+    if(editIdx !== null){
+      sessionStorage.removeItem('editCallIdx')
+      window.edit(Number(editIdx))
+    }
 
     if (typeof lucide !== 'undefined') lucide.createIcons()
   </script>

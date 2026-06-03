@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fila de Chamados</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { max-width: 1100px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
+    a.back:hover { opacity: 1; text-decoration: underline; }
+    h1 { font-size: 1.35rem; font-weight: 700; margin: 0; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    h1 svg { color: #188331; }
+    p.muted { color: #64748b; font-size: 0.85rem; margin: -12px 0 18px; }
+
+    #btn-abrir {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border: none; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; background: #188331; color: #fff;
+      transition: all 0.2s; margin-bottom: 20px;
+    }
+    #btn-abrir:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
+    #btn-abrir svg { width: 18px; height: 18px; }
+    #btn-abrir:active { transform: scale(0.97); }
+
+    .table-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
+      border: 1px solid #f0f0f0;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 12px 14px; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      background: #f8fafc; color: #475569;
+      border-bottom: 1.5px solid #e2e8f0; text-align: left;
+    }
+    td {
+      padding: 11px 14px; font-size: 0.85rem; color: #334155;
+      border-bottom: 1px solid #f1f5f9; vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 600;
+    }
+    .status-badge svg { width: 12px; height: 12px; }
+    .status-waiting { background: #dbeafe; color: #1d4ed8; }
+    .status-maintenance { background: #fee2e2; color: #b91c1c; }
+    .status-delivered { background: #dcfce7; color: #15803d; }
+
+    .actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .actions select {
+      padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 6px;
+      font-size: 0.75rem; font-family: inherit; color: #334155;
+      background: #fff; outline: none; cursor: pointer;
+    }
+    .actions select:focus { border-color: #188331; box-shadow: 0 0 0 2px rgba(24,131,49,0.12); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 10px; border: none; border-radius: 6px;
+      font-size: 0.72rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    }
+    .btn svg { width: 13px; height: 13px; }
+    .btn-sm { padding: 4px 8px; font-size: 0.68rem; }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
+    .btn-danger:hover { background: #fecaca; }
+    .btn:active { transform: scale(0.96); }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="utils.js"></script>
+</head>
+<body>
+  <a href="index.html" id="logo-link"><img id="site-logo" src="logo_secretaria_gecotec.png" alt="Logotipo"></a>
+  <button id="btnSair" class="btn-sair" title="Sair"><i data-lucide="log-out"></i></button>
+  <div class="sidebar">
+    <div class="user-avatar" id="userAvatar">U</div>
+    <nav>
+      <ul>
+        <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
+        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
+        <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
+        <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
+        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        </ul>
+    </nav>
+  </div>
+
+
+  <header>
+    <a class="back" href="index.html">← Voltar</a>
+    <h1>Fila de Chamados</h1>
+  </header>
+
+
+  <p class="muted">Adicione chamados de máquinas e altere o status entre Aguardando, Em manutenção e Entregue.</p>
+
+
+  <button type="button" id="btn-abrir" onclick="location.href='chamado.html'"><i data-lucide="plus-circle"></i> Abrir Chamado</button>
+
+
+  <div class="table-card">
+  <table id="tbl-chamados">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Máquina</th>
+        <th>Departamento</th>
+        <th>Descrição</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  </div>
+
+
+  <script>
+    const KEY = 'calls_v1'
+    const tbody = document.querySelector('#tbl-chamados tbody')
+
+
+    function load(){ try{ return JSON.parse(localStorage.getItem(KEY) || '[]') }catch(e){return[]} }
+    function save(list){ localStorage.setItem(KEY, JSON.stringify(list)); render() }
+
+
+    function statusHtml(s){
+      const map = {'Aguardando':'status-waiting clock','Em manutenção':'status-maintenance wrench','Entregue':'status-delivered check-circle'}
+      const [cls, icon] = (map[s]||'').split(' ')
+      return `<span class="status-badge ${cls}"><i data-lucide="${icon}"></i> ${s}</span>`
+    }
+
+
+    function render(){
+      const list = load()
+      tbody.innerHTML = ''
+      list.forEach((c,i)=>{
+        const tr = document.createElement('tr')
+        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(c.machine)}</td><td>${escapeHtml(c.dept)}</td><td>${escapeHtml(c.desc)}</td><td>${statusHtml(c.status)}</td><td class="actions"></td>`
+        const actions = tr.querySelector('td:last-child')
+        const select = document.createElement('select')
+        ['Aguardando','Em manutenção','Entregue'].forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; if(s===c.status) o.selected=true; select.appendChild(o) })
+        select.addEventListener('change', ()=>{ c.status = select.value; const l = load(); l[i]=c; save(l) })
+        const editBtn = document.createElement('button'); editBtn.innerHTML = '<i data-lucide="pencil"></i> Editar'; editBtn.className = 'btn btn-secondary btn-sm'; editBtn.addEventListener('click', ()=>{ edit(i) })
+        const delBtn = document.createElement('button'); delBtn.innerHTML = '<i data-lucide="trash-2"></i>'; delBtn.className = 'btn btn-danger btn-sm'; delBtn.title = 'Remover'; delBtn.addEventListener('click', ()=>{ if(confirm('Remover chamado?')){ const l=load(); l.splice(i,1); save(l) } })
+        actions.appendChild(select); actions.appendChild(editBtn); actions.appendChild(delBtn)
+        tbody.appendChild(tr)
+      })
+      if (typeof lucide !== 'undefined') lucide.createIcons()
+    }
+
+
+    window.edit = function(i){
+      sessionStorage.setItem('editCallIdx', i)
+      window.location.href = 'chamado.html'
+    }
+
+
+    render()
+    if (typeof lucide !== 'undefined') lucide.createIcons()
+  </script>
+</body>
+</html>
