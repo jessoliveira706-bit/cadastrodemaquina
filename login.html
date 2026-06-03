@@ -101,16 +101,16 @@
         <p>Faça login para continuar</p>
       </div>
 
-      <div class="error-msg" id="loginError"><i data-lucide="alert-circle"></i> <span id="errorText">E-mail ou senha inválidos</span></div>
+      <div class="error-msg" id="loginError"><i data-lucide="alert-circle"></i> <span id="errorText">Usuário ou senha inválidos</span></div>
 
       <form id="loginForm" autocomplete="off">
         <div class="form-group">
-          <label><i data-lucide="mail"></i> E-mail</label>
-          <input id="email" type="email" placeholder="seu@email.com" required autofocus />
+          <label><i data-lucide="user"></i> Usuário</label>
+          <input id="username" type="text" placeholder="seu usuário" required autofocus autocomplete="username" />
         </div>
         <div class="form-group">
           <label><i data-lucide="lock"></i> Senha</label>
-          <input id="password" type="password" placeholder="Sua senha" required />
+          <input id="password" type="password" placeholder="Sua senha" required autocomplete="current-password" />
         </div>
         <button type="submit" class="btn btn-primary"><i data-lucide="log-in"></i> Entrar</button>
       </form>
@@ -121,37 +121,56 @@
     </div>
   </div>
 
+  <script src="utils.js"></script>
   <script>
     const form = document.getElementById('loginForm')
     const errorEl = document.getElementById('loginError')
     const errorText = document.getElementById('errorText')
+    const submitBtn = form.querySelector('button[type="submit"]')
 
     function showError(msg) {
       errorText.textContent = msg
       errorEl.classList.add('show')
     }
 
-    form.addEventListener('submit', e => {
+    function initialsFrom(nome) {
+      if (!nome) return 'U'
+      return nome.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    }
+
+    form.addEventListener('submit', async e => {
       e.preventDefault()
       errorEl.classList.remove('show')
 
-      const email = document.getElementById('email').value.trim()
+      const username = document.getElementById('username').value.trim()
       const password = document.getElementById('password').value
 
-      if (!email || !password) { showError('Preencha todos os campos'); return }
+      if (!username || !password) { showError('Preencha todos os campos'); return }
 
-      const users = JSON.parse(localStorage.getItem('usuarios_v1') || '[]')
-      const user = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase())
+      submitBtn.disabled = true
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        })
 
-      if (!user) { showError('Usuário não encontrado'); return }
-      if (user.password && user.password !== password) { showError('Senha incorreta'); return }
-      if (!user.password) { showError('Usuário sem senha cadastrada'); return }
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          showError(data.error || 'Usuário ou senha inválidos')
+          return
+        }
 
-      const initials = user.name
-        ? user.name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
-        : 'U'
-      localStorage.setItem('user_initials', initials)
-      window.location.href = 'index.html'
+        const { token, user } = await res.json()
+        // Sessão no padrão do auth-kit: { token, ...user } em sessionStorage.
+        sessionStorage.setItem('auth_user', JSON.stringify({ token, ...user }))
+        localStorage.setItem('user_initials', initialsFrom(user.nome))
+        window.location.href = 'index.html'
+      } catch (err) {
+        showError('Não foi possível conectar ao servidor')
+      } finally {
+        submitBtn.disabled = false
+      }
     })
 
     if (typeof lucide !== 'undefined') lucide.createIcons()

@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-inventario}
+      POSTGRES_USER: ${DB_USER:-inventario}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-inventario}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      # Scripts de inicialização (rodam só na 1ª criação do volume).
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      # DDL original referenciado por 01-schema.sql (\i /sql/...).
+      - ./SQL_Tabelas_2.2.sql:/sql/SQL_Tabelas_2.2.sql:ro
+    ports:
+      # Host 5433 -> container 5432 (evita conflito com Postgres local na 5432).
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-inventario} -d ${DB_NAME:-inventario}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./server
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-inventario}
+      DB_USER: ${DB_USER:-inventario}
+      DB_PASSWORD: ${DB_PASSWORD:-inventario}
+      FRONTEND_DIR: /frontend
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Frontend estático (raiz do projeto) servido pela API na mesma origem.
+      - ..:/frontend:ro
+    ports:
+      - "3001:3001"
+
+volumes:
+  dbdata:
