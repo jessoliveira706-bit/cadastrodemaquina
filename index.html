@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Cadastro - Início</title>
+    <style>
+        body{font-family:Arial,Helvetica,sans-serif;max-width:960px;margin:48px auto;padding:0 16px;color:#222}
+        h1{font-size:22px;margin-bottom:8px;text-align:center}
+        p{color:#5c6981;text-align:center}
+        .cards{display:flex;gap:12px;margin-top:24px;justify-content:center}
+        .card{flex:1;padding:20px;border:1px solid #020202;border-radius:8px;text-align:center;background:#e7e5e5;max-width:340px}
+        .card a{display:inline-block;margin-top:12px;padding:10px 14px;background:#0366d6;color:#ebe8e8;border-radius:6px;text-decoration:none}
+        .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin:28px 0 10px}
+        .stats{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;justify-content:center}
+        .stat-card{flex:1 1 140px;max-width:200px;padding:16px 12px;border-radius:10px;text-align:center;border:1px solid rgba(0,0,0,.07)}
+        .stat-card .s-label{font-size:12px;color:#666;margin-bottom:6px}
+        .stat-card .s-count{font-size:30px;font-weight:800;line-height:1}
+        .stat-card.blue{background:rgba(3,102,214,.08)}.stat-card.blue .s-count{color:#0366d6}
+        .stat-card.indigo{background:rgba(13,110,253,.08)}.stat-card.indigo .s-count{color:#0d6efd}
+        .stat-card.green{background:rgba(40,167,69,.08)}.stat-card.green .s-count{color:#28a745}
+        .stat-card.red{background:rgba(220,53,69,.08)}.stat-card.red .s-count{color:#dc3545}
+        .stat-card.orange{background:rgba(253,126,20,.08)}.stat-card.orange .s-count{color:#fd7e14}
+        .stat-card.gray{background:rgba(108,117,125,.08)}.stat-card.gray .s-count{color:#6c757d}
+        .stat-card.teal{background:rgba(32,201,151,.08)}.stat-card.teal .s-count{color:#20c997}
+        .stat-card.purple{background:rgba(111,66,193,.08)}.stat-card.purple .s-count{color:#6f42c1}
+    </style>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="utils.js"></script>
+</head>
+<body>
+    <a href="index.html" id="logo-link"><img id="site-logo" src="logo_secretaria_gecotec.png" alt="Logotipo"></a>
+        <div class="sidebar">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
+                    <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+                    <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
+                    <li><a href="unidades.html"><i data-lucide="building"></i> Unidades</a></li>
+                    <li><a href="departments.html"><i data-lucide="folder"></i> Departamentos</a></li>
+                    </ul>
+            </nav>
+        </div>
+
+
+   
+</body>
+<script>
+    function set(id, val){ document.getElementById(id).textContent = val }
+
+
+    function updateAll(){
+        try{
+            const calls = JSON.parse(localStorage.getItem('calls_v1') || '[]')
+            set('count-open',       calls.filter(c=>c.status!=='Entregue').length)
+            set('count-awaiting',   calls.filter(c=>c.status==='Aguardando').length)
+            set('count-maintenance',calls.filter(c=>c.status==='Em manutenção').length)
+            set('count-delivered',  calls.filter(c=>c.status==='Entregue').length)
+        }catch(e){}
+
+
+        try{
+            const machines = JSON.parse(localStorage.getItem('machines_alocadas_v1') || '[]')
+            set('count-machines-total',     machines.length)
+            set('count-machines-alocada',   machines.filter(m=>m.status==='Alocada').length)
+            set('count-machines-disponivel',machines.filter(m=>m.status==='Disponível').length)
+            set('count-machines-manutencao',machines.filter(m=>m.status==='Manutenção').length)
+            set('count-machines-devolucao', machines.filter(m=>m.status==='Devolução').length)
+        }catch(e){}
+
+
+        try{
+            const depts = JSON.parse(localStorage.getItem('departments_v1') || '[]')
+            set('count-departments', depts.length)
+        }catch(e){}
+
+
+        try{
+            const units = JSON.parse(localStorage.getItem('units_list_v1') || '[]')
+            set('count-units', units.length)
+        }catch(e){}
+    }
+
+
+    updateAll()
+    window.addEventListener('storage', updateAll)
+    if (typeof lucide !== 'undefined') lucide.createIcons()
+</script>
+</html>
