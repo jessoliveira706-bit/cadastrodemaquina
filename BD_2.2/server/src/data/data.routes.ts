@@ -61,13 +61,44 @@ export function createDataRouter(): Router {
   const router = Router();
 
   // Entidades das telas (CRUD completo).
+  registrarRecurso(router, { path: "secretarias", tabela: "secretarias", pk: "id" });
   registrarRecurso(router, { path: "departamentos", tabela: "departamentos", pk: "id" });
   registrarRecurso(router, { path: "unidades", tabela: "unidades", pk: "id" });
-  registrarRecurso(router, { path: "equipamentos", tabela: "equipamentos", pk: "patrimonio" });
+  // Equipamentos com mapeamento unidades_id ↔ secretarias_id (já que a coluna
+  // no banco se chama unidades_id, mas o frontend usa secretarias_id).
+  router.get("/equipamentos", wrap(async (_req, res) => {
+    const rows = await crud.listar("equipamentos");
+    return res.json(rows.map(mapaSecretaria));
+  }));
+  router.get("/equipamentos/:id", wrap(async (req, res) => {
+    const row = await crud.obter("equipamentos", "patrimonio", req.params.id);
+    if (!row) return res.status(404).json({ error: "Não encontrado" });
+    return res.json(mapaSecretaria(row));
+  }));
+  router.post("/equipamentos", wrap(async (req, res) => {
+    const dados = { ...req.body, unidades_id: req.body.secretarias_id };
+    delete dados.secretarias_id;
+    return res.status(201).json(mapaSecretaria(await crud.inserir("equipamentos", dados)));
+  }));
+  router.put("/equipamentos/:id", wrap(async (req, res) => {
+    const dados = { ...req.body, unidades_id: req.body.secretarias_id };
+    delete dados.secretarias_id;
+    const row = await crud.atualizar("equipamentos", "patrimonio", req.params.id, dados);
+    if (!row) return res.status(404).json({ error: "Não encontrado" });
+    return res.json(mapaSecretaria(row));
+  }));
+  router.delete("/equipamentos/:id", wrap(async (req, res) => {
+    const ok = await crud.remover("equipamentos", "patrimonio", req.params.id);
+    if (!ok) return res.status(404).json({ error: "Não encontrado" });
+    return res.status(204).end();
+  }));
+  function mapaSecretaria(row: crud.Row): crud.Row {
+    return { ...row, secretarias_id: row.unidades_id };
+  }
   registrarRecurso(router, { path: "funcionarios", tabela: "funcionarios", pk: "matricula" });
 
   // Tabelas de apoio (só leitura — para preencher selects).
-  for (const t of ["status", "tipos", "secretarias", "municipios", "bairros", "ruas"]) {
+  for (const t of ["status", "tipos", "municipios", "bairros", "ruas"]) {
     registrarRecurso(router, { path: t, tabela: t, pk: "id", readonly: true });
   }
 

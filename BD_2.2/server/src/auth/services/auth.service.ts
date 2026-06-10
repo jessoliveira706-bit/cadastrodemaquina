@@ -3,7 +3,22 @@ import bcrypt from "bcryptjs";
 import { findByLogin } from "./user.repo";
 import { mapearProfile, mapearRole } from "./profile.service";
 import { authenticateViaLdap, ldapConfigured } from "./ldap.service";
+import { pool } from "../../db/pool";
 import type { JwtPayload } from "../types";
+
+export async function resetPassword(
+  login: string,
+  newPassword: string,
+): Promise<void> {
+  if (!pool) throw new Error("Banco de dados indisponível");
+  const row = await findByLogin(login);
+  if (!row) throw new Error("Usuário não encontrado");
+  const senhaHash = await bcrypt.hash(newPassword, 10);
+  await pool.query(
+    `UPDATE "tabelasInventarioMaquina".usuarios SET "senhaHash" = $1 WHERE id = $2`,
+    [senhaHash, row.id],
+  );
+}
 
 function makeToken(payload: Omit<JwtPayload, "iat" | "exp">): string {
   const secret = process.env.JWT_SECRET;

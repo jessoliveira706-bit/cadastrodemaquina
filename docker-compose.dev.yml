@@ -15,3 +15,4 @@ services:
       - ./BD_2.2/server/tsconfig.json:/app/tsconfig.json:ro
       # Frontend ao vivo (na imagem ele é copiado; aqui sobrepomos com o host).
       - ./client:/frontend:ro
+      # Frontend ao vivo e backend fonte montados (sem certificados)

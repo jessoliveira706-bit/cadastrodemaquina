@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Chamado - Cadastro</title>
+  <title>Registrar Movimentação</title>
   <style>
     * { box-sizing: border-box; }
     body { max-width: 680px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
@@ -79,17 +79,17 @@
     <nav>
       <ul>
         <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
-        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="fila.html"><i data-lucide="history"></i> Histórico</a></li>
         <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
         <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
         <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
-        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        <li><a href="secretarias-list.html"><i data-lucide="building-2"></i> Secretarias</a></li>
         </ul>
     </nav>
   </div>
   <header>
     <a class="back" href="fila.html">← Voltar</a>
-    <h1>Cadastro de Chamado</h1>
+    <h1><i data-lucide="plus-circle"></i> Registrar Movimentação</h1>
   </header>
 
   <div class="form-card">
@@ -97,34 +97,63 @@
     <input type="hidden" id="idx" />
 
     <div class="form-group">
-      <label><i data-lucide="monitor"></i> Máquina</label>
-      <input id="machine" placeholder="Patrimônio ou nome da máquina" required />
+      <label><i data-lucide="monitor"></i> Patrimônio da Máquina</label>
+      <input id="patrimonio" placeholder="Ex: 000123" required />
     </div>
+    
     <div class="form-group">
-      <label><i data-lucide="folder"></i> Departamento</label>
-      <input id="dept" placeholder="Nome do departamento" />
-    </div>
-    <div class="form-group full">
-      <label><i data-lucide="align-left"></i> Descrição</label>
-      <textarea id="desc" placeholder="Descreva o problema ou motivo do chamado..." rows="3"></textarea>
-    </div>
-    <div class="form-group">
-      <label><i data-lucide="circle"></i> Status</label>
-      <select id="status">
-        <option value="Aguardando">Aguardando</option>
-        <option value="Em manutenção">Em manutenção</option>
-        <option value="Entregue">Entregue</option>
+      <label><i data-lucide="arrow-right"></i> Tipo de Movimentação</label>
+      <select id="tipoMovimentacao" required>
+        <option value="">-- Selecione --</option>
+        <option value="Entrada">Entrada</option>
+        <option value="Saída">Saída</option>
+        <option value="Transferência">Transferência</option>
+        <option value="Manutenção">Manutenção</option>
+        <option value="Outro">Outro</option>
       </select>
     </div>
+
+    <div class="form-group">
+      <label><i data-lucide="folder"></i> Departamento Anterior</label>
+      <input id="deptAnterior" placeholder="Departamento de origem" />
+    </div>
+    <div class="form-group">
+      <label><i data-lucide="folder"></i> Departamento Novo</label>
+      <input id="deptNovo" placeholder="Departamento de destino" />
+    </div>
+
+    <div class="form-group">
+      <label><i data-lucide="building-2"></i> Secretaria Anterior</label>
+      <input id="secAnterior" placeholder="Secretaria de origem" />
+    </div>
+    <div class="form-group">
+      <label><i data-lucide="building-2"></i> Secretaria Nova</label>
+      <input id="secNova" placeholder="Secretaria de destino" />
+    </div>
+
+    <div class="form-group">
+      <label><i data-lucide="building"></i> Unidade Anterior</label>
+      <input id="unitAnterior" placeholder="Unidade de origem" />
+    </div>
+    <div class="form-group">
+      <label><i data-lucide="building"></i> Unidade Nova</label>
+      <input id="unitNova" placeholder="Unidade de destino" />
+    </div>
+
+    <div class="form-group full">
+      <label><i data-lucide="align-left"></i> Observação</label>
+      <textarea id="obs" placeholder="Detalhes adicionais da movimentação..." rows="4"></textarea>
+    </div>
+
     <div class="full controls">
-      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Salvar</button>
-      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="trash-2"></i> Limpar</button>
+      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Salvar Movimentação</button>
+      <button type="button" class="btn btn-secondary" id="clearBtn"><i data-lucide="x"></i> Limpar</button>
     </div>
   </form>
   </div>
 
   <script>
-    const KEY = 'calls_v1'
+    const KEY = 'historico_movimentacoes_v1'
     const form = document.getElementById('callForm')
 
     function load(){
@@ -132,39 +161,56 @@
     }
     function save(list){ localStorage.setItem(KEY, JSON.stringify(list)) }
 
+    function obterUsuarioLogado(){
+      try {
+        const auth = JSON.parse(sessionStorage.getItem('auth_user') || '{}')
+        return auth.nome || auth.usuario || 'Usuário'
+      } catch (e) {
+        return 'Usuário'
+      }
+    }
+
     form.addEventListener('submit', e => {
       e.preventDefault()
       const idx = document.getElementById('idx').value
+      const patrimonio = document.getElementById('patrimonio').value.trim()
+      const tipoMov = document.getElementById('tipoMovimentacao').value
+
+      if(!patrimonio){ alert('Informe o patrimônio da máquina'); return }
+      if(!tipoMov){ alert('Selecione o tipo de movimentação'); return }
+
       const item = {
-        machine: document.getElementById('machine').value.trim(),
-        dept: document.getElementById('dept').value.trim(),
-        desc: document.getElementById('desc').value.trim(),
-        status: document.getElementById('status').value
+        id: Date.now() + Math.random(),
+        patrimonio: patrimonio,
+        dataHora: new Date().toISOString(),
+        usuario: obterUsuarioLogado(),
+        tipoMovimentacao: tipoMov,
+        departamentoAnterior: document.getElementById('deptAnterior').value.trim() || null,
+        departamentoNovo: document.getElementById('deptNovo').value.trim() || null,
+        secretariaAnterior: document.getElementById('secAnterior').value.trim() || null,
+        secretariaNova: document.getElementById('secNova').value.trim() || null,
+        unidadeAnterior: document.getElementById('unitAnterior').value.trim() || null,
+        unidadeNova: document.getElementById('unitNova').value.trim() || null,
+        observacao: document.getElementById('obs').value.trim()
       }
-      if(!item.machine){ alert('Informe a máquina'); return }
+
       const list = load()
-      if(idx === '') list.push(item); else list[Number(idx)] = item
+      list.push(item)
       save(list)
-      form.reset(); document.getElementById('idx').value = ''
-      alert('Chamado salvo!')
+      window.location.href = 'fila.html?_=' + Date.now()
     })
 
-    window.edit = function(i){
-      const list = load(); const c = list[i]; if(!c) return
-      document.getElementById('idx').value = i
-      document.getElementById('machine').value = c.machine
-      document.getElementById('dept').value = c.dept
-      document.getElementById('desc').value = c.desc
-      document.getElementById('status').value = c.status
-      window.scrollTo({top:0,behavior:'smooth'})
+    function limpar(){
+      form.reset()
+      document.getElementById('idx').value = ''
     }
 
-    document.getElementById('clearBtn').addEventListener('click', () => { form.reset(); document.getElementById('idx').value = '' })
+    document.getElementById('clearBtn').addEventListener('click', limpar)
 
-    const editIdx = sessionStorage.getItem('editCallIdx')
-    if(editIdx !== null){
-      sessionStorage.removeItem('editCallIdx')
-      window.edit(Number(editIdx))
+    const chamadoMachine = sessionStorage.getItem('chamadoMachine')
+    if(chamadoMachine !== null){
+      sessionStorage.removeItem('chamadoMachine')
+      document.getElementById('patrimonio').value = chamadoMachine
     }
 
     if (typeof lucide !== 'undefined') lucide.createIcons()

@@ -3,7 +3,6 @@ import path from "node:path";
 import express from "express";
 import helmet from "helmet";
 import { createAuthRouter } from "./auth/routes/auth.routes";
-import { authRequired } from "./auth/middleware/auth";
 import { createDataRouter } from "./data/data.routes";
 import { dbEnabled } from "./db/pool";
 
@@ -41,9 +40,8 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/auth", createAuthRouter());
 
-// Rotas de dados (todas exigem JWT). /api/auth e /api/health acima já foram
-// resolvidas antes deste middleware, então não passam pelo authRequired.
-app.use("/api", authRequired, createDataRouter());
+// Rotas de dados agora públicas conforme solicitado
+app.use("/api", createDataRouter());
 
 // Frontend estático (mesma origem → sem CORS). dotfiles:"ignore" protege .env.
 const frontendDir = process.env.FRONTEND_DIR

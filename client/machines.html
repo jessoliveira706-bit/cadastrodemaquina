@@ -6,7 +6,7 @@
   <title>Máquinas - Cadastro</title>
   <style>
     * { box-sizing: border-box; }
-    body { max-width: 1000px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    body { max-width: 100%; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
     header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
     a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
     a.back:hover { opacity: 1; text-decoration: underline; }
@@ -20,13 +20,14 @@
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-group label { font-size: 0.7rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 5px; }
     .form-group label svg { width: 13px; height: 13px; color: #188331; flex-shrink: 0; }
-    .form-group input, .form-group select {
+    .form-group input, .form-group select, .form-group textarea {
       width: 100%; padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px;
       font-size: 0.85rem; font-family: inherit; color: #1e293b; background: #f8fafc; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .form-group input:focus, .form-group select:focus { border-color: #188331; box-shadow: 0 0 0 3px rgba(24,131,49,0.12); background: #fff; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #188331; box-shadow: 0 0 0 3px rgba(24,131,49,0.12); background: #fff; }
     .form-group input:read-only { background: #eef2f6; color: #64748b; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
 
     .controls { grid-column: 1 / -1; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px; padding-top: 16px; border-top: 1.5px solid #e2e8f0; }
     .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
@@ -56,6 +57,8 @@
       .full { grid-column: 1; }
       .controls { flex-direction: column; align-items: stretch; }
       th, td { padding: 8px 10px; font-size: 0.78rem; }
+      #filterCard { padding: 16px 16px 12px; }
+      #filterCard > div { grid-template-columns: 1fr !important; }
     }
   </style>
   <link rel="stylesheet" href="styles.css">
@@ -70,11 +73,11 @@
     <nav>
       <ul>
         <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
-        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="fila.html"><i data-lucide="history"></i> Histórico</a></li>
         <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
         <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
         <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
-        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        <li><a href="secretarias-list.html"><i data-lucide="building-2"></i> Secretarias</a></li>
         </ul>
     </nav>
   </div>
@@ -82,7 +85,7 @@
     <a class="back" href="index.html">← Voltar</a>
     <h1><i data-lucide="monitor"></i> Cadastro de Máquinas</h1>
   </header>
-  <p class="muted">Equipamentos vinculados a tipo, status, departamento, unidade e funcionário.</p>
+  <p class="muted">Equipamentos vinculados a tipo, status, departamento, secretaria e funcionário.</p>
 
   <div class="form-card">
   <form id="machineForm">
@@ -105,16 +108,17 @@
       <select id="departamento" data-rota="departamentos" required><option value="">--</option></select>
     </div>
     <div class="form-group">
-      <label><i data-lucide="building"></i> Unidade</label>
-      <select id="unidade" data-rota="unidades" required><option value="">--</option></select>
+      <label><i data-lucide="building-2"></i> Secretaria</label>
+      <select id="secretaria" data-rota="secretarias" required><option value="">--</option></select>
     </div>
     <div class="form-group">
-      <label><i data-lucide="user"></i> Funcionário</label>
-      <select id="funcionario" required><option value="">--</option></select>
+      <label><i data-lucide="user"></i> Funcionário responsável pelo equipamento</label>
+      <input id="funcionario" placeholder="Nome ou matrícula do funcionário" list="funcionariosList" required />
+      <datalist id="funcionariosList"></datalist>
     </div>
     <div class="form-group full">
       <label><i data-lucide="align-left"></i> Observação</label>
-      <input id="observacao" placeholder="Observação" />
+      <textarea id="observacao" placeholder="Observação" rows="5"></textarea>
     </div>
 
     <div class="full controls">
@@ -125,6 +129,42 @@
   </form>
   </div>
 
+  <div class="form-card" id="filterCard">
+    <h3 style="margin: 0 0 16px 0; font-size: 0.9rem; font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+      <i data-lucide="filter"></i> Filtrar resultados
+    </h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 16px;">
+      <div class="form-group">
+        <label style="margin-bottom: 4px;">Patrimônio</label>
+        <input type="text" id="filterPatrimonio" placeholder="Buscar patrimônio..." style="font-size: 0.85rem;">
+      </div>
+      <div class="form-group">
+        <label style="margin-bottom: 4px;">Tipo</label>
+        <select id="filterTipo" style="font-size: 0.85rem;">
+          <option value="">— Todos —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label style="margin-bottom: 4px;">Status</label>
+        <select id="filterStatus" style="font-size: 0.85rem;">
+          <option value="">— Todos —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label style="margin-bottom: 4px;">Departamento</label>
+        <select id="filterDepartamento" style="font-size: 0.85rem;">
+          <option value="">— Todos —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label style="margin-bottom: 4px;">Secretaria</label>
+        <select id="filterSecretaria" style="font-size: 0.85rem;">
+          <option value="">— Todos —</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
   <div class="table-card">
   <table id="machinesTable">
     <thead>
@@ -133,7 +173,7 @@
         <th>Tipo</th>
         <th>Status</th>
         <th>Departamento</th>
-        <th>Unidade</th>
+        <th>Secretaria</th>
         <th>Funcionário</th>
         <th>Observação</th>
         <th style="width:130px">Ações</th>
@@ -148,24 +188,71 @@
     const tbody = document.querySelector('#machinesTable tbody')
     const countEl = document.getElementById('count')
 
+    const auth = (typeof getAuthUser === 'function') ? getAuthUser() : JSON.parse(sessionStorage.getItem('auth_user') || '{}')
+    const privileged = (typeof isPrivilegedUser === 'function') ? isPrivilegedUser() : false
+    const CREATED_BY_KEY = 'machines_created_by_v1'
+    let createdByMap = loadData ? loadData(CREATED_BY_KEY) || {} : JSON.parse(localStorage.getItem(CREATED_BY_KEY) || '{}')
+
     // selects de apoio (value = id, label = nome) + funcionario (value = matricula)
     const apoio = {
       tipo: document.getElementById('tipo'),
       status: document.getElementById('status'),
       departamento: document.getElementById('departamento'),
-      unidade: document.getElementById('unidade'),
+      secretaria: document.getElementById('secretaria'),
     }
     const selFunc = document.getElementById('funcionario')
 
+    // filtros
+    const filters = {
+      patrimonio: document.getElementById('filterPatrimonio'),
+      tipo: document.getElementById('filterTipo'),
+      status: document.getElementById('filterStatus'),
+      departamento: document.getElementById('filterDepartamento'),
+      secretaria: document.getElementById('filterSecretaria'),
+    }
+
     // mapas id->nome para a tabela
-    let maps = { tipos: {}, status: {}, departamentos: {}, unidades: {}, funcionarios: {} }
+    let maps = { tipos: {}, status: {}, departamentos: {}, secretarias: {}, funcionarios: {} }
+    let allMachines = [] // armazena todas as máquinas
+
+    // funções para histórico
+    function obterUsuarioLogado(){
+      try {
+        const auth = JSON.parse(sessionStorage.getItem('auth_user') || '{}')
+        return auth.nome || auth.usuario || 'Usuário'
+      } catch (e) {
+        return 'Usuário'
+      }
+    }
+
+    function registrarMovimentacao(patrimonio, tipoMov, deptAnt, deptNov, secAnt, secNov, obs = ''){
+      try {
+        const histKey = 'historico_movimentacoes_v1'
+        const hist = JSON.parse(localStorage.getItem(histKey) || '[]')
+        hist.push({
+          id: Date.now() + Math.random(),
+          patrimonio: patrimonio,
+          dataHora: new Date().toISOString(),
+          usuario: obterUsuarioLogado(),
+          tipoMovimentacao: tipoMov,
+          departamentoAnterior: deptAnt || null,
+          departamentoNovo: deptNov || null,
+          secretariaAnterior: secAnt || null,
+          secretariaNova: secNov || null,
+          unidadeAnterior: null,
+          unidadeNova: null,
+          observacao: obs
+        })
+        localStorage.setItem(histKey, JSON.stringify(hist))
+      } catch (e) { console.error('Erro ao registrar movimentação:', e) }
+    }
 
     async function carregarApoio(){
-      const [tipos, status, departamentos, unidades, funcionarios] = await Promise.all([
+      const [tipos, status, departamentos, secretarias, funcionarios] = await Promise.all([
         apiFetch('/api/tipos').then(r => r.json()),
         apiFetch('/api/status').then(r => r.json()),
         apiFetch('/api/departamentos').then(r => r.json()),
-        apiFetch('/api/unidades').then(r => r.json()),
+        apiFetch('/api/secretarias').then(r => r.json()),
         apiFetch('/api/funcionarios').then(r => r.json()),
       ])
       const fill = (sel, itens, value='id', label='nome') => {
@@ -176,46 +263,80 @@
         }
       }
       fill(apoio.tipo, tipos); fill(apoio.status, status)
-      fill(apoio.departamento, departamentos); fill(apoio.unidade, unidades)
+      fill(apoio.departamento, departamentos); fill(apoio.secretaria, secretarias)
+      
+      // preencher filtros também
+      fill(filters.tipo, tipos); fill(filters.status, status)
+      fill(filters.departamento, departamentos); fill(filters.secretaria, secretarias)
+      
+      const dl = document.getElementById('funcionariosList')
       for (const f of funcionarios) {
         const opt = document.createElement('option')
-        opt.value = f.matricula; opt.textContent = `${f.nome} (${f.matricula})`
-        selFunc.appendChild(opt)
+        opt.value = f.matricula
+        opt.textContent = `${f.nome} (${f.matricula})`
+        dl.appendChild(opt)
       }
       maps.tipos = Object.fromEntries(tipos.map(t => [t.id, t.nome]))
       maps.status = Object.fromEntries(status.map(s => [s.id, s.nome]))
       maps.departamentos = Object.fromEntries(departamentos.map(d => [d.id, d.nome]))
-      maps.unidades = Object.fromEntries(unidades.map(u => [u.id, u.nome]))
+      maps.secretarias = Object.fromEntries(secretarias.map(s => [s.id, s.nome]))
       maps.funcionarios = Object.fromEntries(funcionarios.map(f => [f.matricula, f.nome]))
     }
 
-    async function render(){
-      let list = []
-      try { list = await apiFetch('/api/equipamentos').then(r => r.json()) }
-      catch (e) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Erro ao carregar.</td></tr>'; return }
-      tbody.innerHTML = ''
-      if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="empty">Nenhuma máquina cadastrada.</td></tr>'
+    function applyFilters(){
+      const patSearch = filters.patrimonio.value.toLowerCase().trim()
+      const tipoFilter = filters.tipo.value
+      const statusFilter = filters.status.value
+      const deptFilter = filters.departamento.value
+      const secFilter = filters.secretaria.value
+
+      let filtered = allMachines.filter(m => {
+        const matchPat = !patSearch || m.patrimonio.toLowerCase().includes(patSearch)
+        const matchTipo = !tipoFilter || String(m.tipos_id) === tipoFilter
+        const matchStatus = !statusFilter || String(m.status_id) === statusFilter
+        const matchDept = !deptFilter || String(m.departamentos_id) === deptFilter
+        const matchSec = !secFilter || String(m.secretarias_id) === secFilter
+        return matchPat && matchTipo && matchStatus && matchDept && matchSec
+      })
+      // non-privileged users see only machines they created
+      if (!privileged) {
+        const userKey = String(auth.nome || auth.usuario || '').trim()
+        filtered = filtered.filter(m => String(createdByMap[m.patrimonio] || '').trim() === userKey)
       }
-      list.forEach(m => {
+
+      tbody.innerHTML = ''
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty">Nenhuma máquina encontrada com os filtros aplicados.</td></tr>'
+      }
+      filtered.forEach(m => {
         const tr = document.createElement('tr')
+        const isOwner = String(createdByMap[m.patrimonio] || '').trim() === String(auth.nome || auth.usuario || '').trim()
+        const actionsHtml = privileged ? (
+          `<button class="btn btn-secondary" onclick='edit(${JSON.stringify(m)})'><i data-lucide="pencil"></i> Editar</button>
+           <button class="btn btn-secondary chamado-btn" data-pat="${escapeHtml(m.patrimonio)}"><i data-lucide="plus-circle"></i> Chamado</button>
+           <button class="btn btn-danger" onclick="del('${encodeURIComponent(m.patrimonio)}')"><i data-lucide="trash-2"></i> Remover</button>`
+        ) : (isOwner ? '' : '') // non-privileged users do not get action buttons
+
         tr.innerHTML = `
           <td>${escapeHtml(m.patrimonio)}</td>
           <td>${escapeHtml(maps.tipos[m.tipos_id] || '—')}</td>
           <td>${escapeHtml(maps.status[m.status_id] || '—')}</td>
           <td>${escapeHtml(maps.departamentos[m.departamentos_id] || '—')}</td>
-          <td>${escapeHtml(maps.unidades[m.unidades_id] || '—')}</td>
+          <td>${escapeHtml(maps.secretarias[m.secretarias_id] || '—')}</td>
           <td>${escapeHtml(maps.funcionarios[m.funcionarios_matricula] || m.funcionarios_matricula || '—')}</td>
           <td>${escapeHtml(m.observacao || '')}</td>
-          <td class="actions">
-            <button class="btn btn-secondary" onclick='edit(${JSON.stringify(m)})'><i data-lucide="pencil"></i> Editar</button>
-            <button class="btn btn-danger" onclick="del('${encodeURIComponent(m.patrimonio)}')"><i data-lucide="trash-2"></i> Remover</button>
-          </td>
+          <td class="actions">${actionsHtml}</td>
         `
         tbody.appendChild(tr)
       })
-      countEl.textContent = `${list.length} itens`
+      countEl.textContent = `${filtered.length} itens`
       if (typeof lucide !== 'undefined') lucide.createIcons()
+    }
+
+    async function render(){
+      try { allMachines = await apiFetch('/api/equipamentos').then(r => r.json()) }
+      catch (e) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Erro ao carregar.</td></tr>'; return }
+      applyFilters()
     }
 
     form.addEventListener('submit', async e => {
@@ -227,15 +348,39 @@
         tipos_id: Number(apoio.tipo.value),
         departamentos_id: Number(apoio.departamento.value),
         funcionarios_matricula: selFunc.value,
-        unidades_id: Number(apoio.unidade.value),
+        secretarias_id: Number(apoio.secretaria.value),
         observacao: document.getElementById('observacao').value.trim(),
       }
       if (!patrimonio || !body.tipos_id || !body.status_id) { alert('Preencha patrimônio, tipo e status.'); return }
+      if (!body.funcionarios_matricula || !maps.funcionarios[body.funcionarios_matricula]) { alert('Selecione um funcionário válido da lista.'); return }
       try {
         if (editPat) {
+          // non-privileged users cannot edit existing machines
+          if (!privileged) { alert('Você não tem permissão para editar máquinas existentes.'); return }
+          // edição: verificar se houve mudança de departamento ou secretaria
+          const machineAtual = allMachines.find(m => m.patrimonio === editPat)
+          if (machineAtual) {
+            const deptAnterior = maps.departamentos[machineAtual.departamentos_id] || null
+            const deptNovo = maps.departamentos[body.departamentos_id] || null
+            const secAnterior = maps.secretarias[machineAtual.secretarias_id] || null
+            const secNova = maps.secretarias[body.secretarias_id] || null
+            
+            // registrar como transferência se houve mudança
+            if (deptAnterior !== deptNovo || secAnterior !== secNova) {
+              registrarMovimentacao(patrimonio, 'Transferência', deptAnterior, deptNovo, secAnterior, secNova, body.observacao)
+            }
+          }
           await apiFetch('/api/equipamentos/' + encodeURIComponent(editPat), { method: 'PUT', body: JSON.stringify(body) })
         } else {
+          // criação: registrar como entrada
           await apiFetch('/api/equipamentos', { method: 'POST', body: JSON.stringify({ patrimonio, ...body }) })
+          // mark creator locally so non-privileged users can see their machines/history
+          try {
+            const userKey = String(obterUsuarioLogado()).trim()
+            createdByMap[patrimonio] = userKey
+            (typeof saveData === 'function') ? saveData(CREATED_BY_KEY, createdByMap) : localStorage.setItem(CREATED_BY_KEY, JSON.stringify(createdByMap))
+          } catch (e) { console.warn('Não foi possível gravar mapa de criadores', e) }
+          registrarMovimentacao(patrimonio, 'Entrada', null, maps.departamentos[body.departamentos_id] || null, null, maps.secretarias[body.secretarias_id] || null, body.observacao)
         }
         limpar(); render()
       } catch (err) { alert('Falha ao salvar.') }
@@ -248,6 +393,12 @@
     }
     document.getElementById('clearBtn').addEventListener('click', limpar)
 
+    // adicionar listeners aos filtros
+    Object.values(filters).forEach(filter => {
+      filter.addEventListener('change', applyFilters)
+      filter.addEventListener('input', applyFilters)
+    })
+
     window.edit = function(m){
       document.getElementById('editPatrimonio').value = m.patrimonio
       const pat = document.getElementById('patrimonio')
@@ -255,7 +406,7 @@
       apoio.tipo.value = m.tipos_id
       apoio.status.value = m.status_id
       apoio.departamento.value = m.departamentos_id
-      apoio.unidade.value = m.unidades_id
+      apoio.secretaria.value = m.secretarias_id
       selFunc.value = (m.funcionarios_matricula || '').trim()
       document.getElementById('observacao').value = m.observacao || ''
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -267,9 +418,23 @@
       catch (e) { alert('Falha ao remover.') }
     }
 
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('.chamado-btn')
+      if (!btn) return
+      const pat = btn.dataset.pat
+      sessionStorage.setItem('chamadoMachine', pat)
+      window.location.href = 'chamado.html'
+    })
+
     ;(async () => {
       try { await carregarApoio(); await render() } catch (e) {}
     })()
+    if (!privileged) {
+      const filterEl = document.getElementById('filterCard')
+      if (filterEl) filterEl.style.display = 'none'
+      const tableCard = document.querySelector('.table-card')
+      if (tableCard) tableCard.style.display = 'none'
+    }
     if (typeof lucide !== 'undefined') lucide.createIcons()
   </script>
 </body>

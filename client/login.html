@@ -89,6 +89,25 @@
       color: #188331; text-decoration: none; font-weight: 600;
     }
     .register-link a:hover { text-decoration: underline; }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15); position: relative;
+    }
+    .modal-box h2 { font-size: 1.1rem; margin: 0 0 4px; color: #1e293b; }
+    .modal-box p.modal-sub { font-size: 0.82rem; color: #64748b; margin: 0 0 20px; }
+    .modal-box .btn-close {
+      position: absolute; top: 16px; right: 16px; background: none; border: none;
+      cursor: pointer; color: #94a3b8; padding: 4px;
+    }
+    .modal-box .btn-close:hover { color: #475569; }
+    .modal-box .form-group { margin-bottom: 14px; }
+    .modal-box .btn { width: 100%; }
   </style>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -112,12 +131,37 @@
           <label><i data-lucide="lock"></i> Senha</label>
           <input id="password" type="password" placeholder="Sua senha" required autocomplete="current-password" />
         </div>
+        <div style="text-align:right; margin-top:-12px; margin-bottom:16px;">
+          <a href="#" style="font-size:0.8rem; color:#188331; text-decoration:none; font-weight:500;">Esqueci minha senha</a>
+        </div>
         <button type="submit" class="btn btn-primary"><i data-lucide="log-in"></i> Entrar</button>
       </form>
 
-      <div class="register-link">
-        Não tem conta? <a href="usuarios.html">Cadastre-se</a>
-      </div>
+
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="resetModal">
+    <div class="modal-box">
+      <button class="btn-close" id="closeModal"><i data-lucide="x"></i></button>
+      <h2>Redefinir Senha</h2>
+      <p class="modal-sub">Digite seu login e a nova senha.</p>
+      <form id="resetForm" autocomplete="off">
+        <div class="form-group">
+          <label><i data-lucide="user"></i> Login</label>
+          <input id="resetLogin" type="text" placeholder="seu login" required autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label><i data-lucide="lock"></i> Nova senha</label>
+          <input id="resetPassword" type="password" placeholder="nova senha" required autocomplete="new-password" />
+        </div>
+        <div class="form-group">
+          <label><i data-lucide="lock"></i> Confirmar nova senha</label>
+          <input id="resetPasswordConfirm" type="password" placeholder="confirme a nova senha" required autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Alterar senha</button>
+      </form>
+      <div id="resetMsg" style="margin-top:12px; font-size:0.82rem; text-align:center;"></div>
     </div>
   </div>
 
@@ -174,6 +218,57 @@
     })
 
     if (typeof lucide !== 'undefined') lucide.createIcons()
+
+    const modal = document.getElementById('resetModal')
+    const closeModal = document.getElementById('closeModal')
+    const esqueci = document.querySelector('a[href="#"]')
+    const resetForm = document.getElementById('resetForm')
+    const resetMsg = document.getElementById('resetMsg')
+
+    esqueci.addEventListener('click', e => {
+      e.preventDefault()
+      resetMsg.textContent = ''
+      resetForm.reset()
+      modal.classList.add('show')
+    })
+
+    closeModal.addEventListener('click', () => modal.classList.remove('show'))
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('show') })
+
+    resetForm.addEventListener('submit', async e => {
+      e.preventDefault()
+      const pass = document.getElementById('resetPassword').value
+      const confirm = document.getElementById('resetPasswordConfirm').value
+      if (pass !== confirm) {
+        resetMsg.textContent = 'As senhas não conferem'
+        resetMsg.style.color = '#dc2626'
+        return
+      }
+      resetMsg.textContent = 'Aguarde...'
+      resetMsg.style.color = '#64748b'
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            login: document.getElementById('resetLogin').value.trim(),
+            newPassword: pass,
+          }),
+        })
+        const data = await res.json()
+        if (res.ok) {
+          resetMsg.textContent = 'Senha alterada com sucesso!'
+          resetMsg.style.color = '#188331'
+          resetForm.reset()
+        } else {
+          resetMsg.textContent = data.error || 'Falha ao redefinir senha'
+          resetMsg.style.color = '#dc2626'
+        }
+      } catch (err) {
+        resetMsg.textContent = 'Erro de conexão com o servidor'
+        resetMsg.style.color = '#dc2626'
+      }
+    })
   </script>
 </body>
 </html>

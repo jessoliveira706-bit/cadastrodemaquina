@@ -85,11 +85,11 @@
             <nav>
                 <ul>
                     <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
-                    <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+                    <li><a href="fila.html"><i data-lucide="history"></i> Histórico</a></li>
                     <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
                     <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
                     <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
-                    <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+                    <li><a href="secretarias-list.html"><i data-lucide="building-2"></i> Secretarias</a></li>
                     </ul>
             </nav>
         </div>
@@ -107,8 +107,6 @@
         <canvas id="chart-machines"></canvas>
       </div>
     </div>
-
-    <div class="table-card" id="kanban-list" style="display:none"></div>
 
 </body>
 <script>
@@ -180,24 +178,9 @@
       })
     }
 
-    function renderKanban(){
-      const calls = JSON.parse(localStorage.getItem('calls_v1') || '[]')
-      const container = document.getElementById('kanban-list')
-      if(!container) return
-      if(calls.length){
-        container.style.display = ''
-        container.innerHTML = calls.map((c, i) =>
-          `<div class="list-row"><span class="num">${i+1}</span><span class="field main">${escapeHtml(c.machine)}</span><span class="field">${escapeHtml(c.dept)}</span><span class="field">${escapeHtml(c.status)}</span></div>`
-        ).join('')
-      } else {
-        container.style.display = 'none'
-      }
-    }
-
     updateCharts()
     updateMachineChart()
-    renderKanban()
-    window.addEventListener('storage', ()=>{ updateCharts(); renderKanban() })
+    window.addEventListener('storage', updateCharts)
     if (typeof lucide !== 'undefined') lucide.createIcons()
 </script>
 </html>

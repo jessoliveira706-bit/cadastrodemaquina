@@ -8,6 +8,7 @@ export function createAuthRouter(): Router {
   const router = Router();
 
   router.post("/login", rateLimit(15, 15 * 60 * 1000), ctrl.login);
+  router.post("/reset-password", ctrl.resetPassword);
   router.get("/me", authRequired, (req, res) => ctrl.me(req as AuthRequest, res));
 
   return router;

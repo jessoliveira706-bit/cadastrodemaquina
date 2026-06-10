@@ -49,11 +49,11 @@
     <nav>
       <ul>
         <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
-        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="fila.html"><i data-lucide="history"></i> Histórico</a></li>
         <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
         <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
         <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
-        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        <li><a href="secretarias-list.html"><i data-lucide="building-2"></i> Secretarias</a></li>
         </ul>
     </nav>
   </div>
@@ -61,7 +61,7 @@
     <a class="back" href="unidades-list.html">← Voltar</a>
     <h1 id="formTitle"><i data-lucide="building"></i> Nova Unidade</h1>
   </header>
-  <p class="muted">Localização vinculada a secretaria, município, bairro e rua.</p>
+  <p class="muted">Unidade vinculada a uma secretaria.</p>
 
   <div class="form-card">
   <form id="unitForm">
@@ -72,16 +72,12 @@
       <select id="secretaria" data-rota="secretarias" required><option value="">-- selecione --</option></select>
     </div>
     <div class="form-group">
-      <label><i data-lucide="map"></i> Município</label>
-      <select id="municipio" data-rota="municipios" required><option value="">-- selecione --</option></select>
-    </div>
-    <div class="form-group">
       <label><i data-lucide="map-pin"></i> Bairro</label>
-      <select id="bairro" data-rota="bairros" required><option value="">-- selecione --</option></select>
+      <input id="bairro" placeholder="Nome do bairro" required />
     </div>
     <div class="form-group">
       <label><i data-lucide="signpost"></i> Rua</label>
-      <select id="rua" data-rota="ruas" required><option value="">-- selecione --</option></select>
+      <input id="rua" placeholder="Nome da rua" required />
     </div>
     <div class="form-group">
       <label><i data-lucide="tag"></i> Nome</label>
@@ -89,7 +85,7 @@
     </div>
     <div class="form-group">
       <label><i data-lucide="phone"></i> Telefone</label>
-      <input id="telefone" placeholder="8 dígitos" maxlength="8" required />
+      <input id="telefone" placeholder="(DDD) número" maxlength="15" inputmode="numeric" required />
     </div>
     <div class="form-group full">
       <label><i data-lucide="align-left"></i> Descrição</label>
@@ -105,17 +101,15 @@
 
   <script>
     const form = document.getElementById('unitForm')
-    const selects = ['secretaria','municipio','bairro','rua'].map(id => document.getElementById(id))
+    const selSec = document.getElementById('secretaria')
 
     async function carregarSelects(){
-      await Promise.all(selects.map(async sel => {
-        const itens = await apiFetch('/api/' + sel.dataset.rota).then(r => r.json())
-        for (const it of itens) {
-          const opt = document.createElement('option')
-          opt.value = it.id; opt.textContent = it.nome
-          sel.appendChild(opt)
-        }
-      }))
+      const itens = await apiFetch('/api/secretarias').then(r => r.json())
+      for (const it of itens) {
+        const opt = document.createElement('option')
+        opt.value = it.id; opt.textContent = it.nome
+        selSec.appendChild(opt)
+      }
     }
 
     async function carregarEdicao(){
@@ -125,9 +119,9 @@
       const u = await apiFetch('/api/unidades/' + id).then(r => r.json())
       document.getElementById('editId').value = u.id
       document.getElementById('secretaria').value = u.secretarias_id
-      document.getElementById('municipio').value = u.municipios_id
-      document.getElementById('bairro').value = u.bairros_id
-      document.getElementById('rua').value = u.ruas_id
+      const end = (u.endereco || '').split(',').map(s => s.trim())
+      document.getElementById('bairro').value = end[0] || ''
+      document.getElementById('rua').value = end[1] || ''
       document.getElementById('nome').value = u.nome || ''
       document.getElementById('telefone').value = (u.telefone || '').trim()
       document.getElementById('descricao').value = u.descricao || ''
@@ -140,12 +134,13 @@
       const editId = document.getElementById('editId').value
       const body = {
         secretarias_id: Number(document.getElementById('secretaria').value),
-        municipios_id: Number(document.getElementById('municipio').value),
-        bairros_id: Number(document.getElementById('bairro').value),
-        ruas_id: Number(document.getElementById('rua').value),
+        municipios_id: 1,
+        bairros_id: 1,
+        ruas_id: 1,
         nome: document.getElementById('nome').value.trim(),
         telefone: document.getElementById('telefone').value.trim(),
         descricao: document.getElementById('descricao').value.trim(),
+        endereco: `${document.getElementById('bairro').value.trim()}, ${document.getElementById('rua').value.trim()}`,
       }
       if (!body.nome || !body.telefone) { alert('Preencha os campos obrigatórios.'); return }
       try {
@@ -160,6 +155,26 @@
       document.getElementById('formTitle').innerHTML = '<i data-lucide="building"></i> Nova Unidade'
       if (typeof lucide !== 'undefined') lucide.createIcons()
     })
+
+    function formatPhone(val) {
+      const digits = val.replace(/\D/g, '').slice(0, 11)
+      if (digits.length === 0) return ''
+      if (digits.length <= 2) return `(${digits}`
+      if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+    }
+
+    const telInput = document.getElementById('telefone')
+    telInput.addEventListener('input', () => {
+      const cursor = telInput.selectionStart
+      telInput.value = formatPhone(telInput.value)
+    })
+
+    const origCarregarEdicao = carregarEdicao
+    carregarEdicao = async function() {
+      await origCarregarEdicao()
+      telInput.value = formatPhone(telInput.value)
+    }
 
     ;(async () => { try { await carregarSelects(); await carregarEdicao() } catch (e) {} })()
     if (typeof lucide !== 'undefined') lucide.createIcons()

@@ -68,11 +68,11 @@
     <nav>
       <ul>
         <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
-        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="fila.html"><i data-lucide="history"></i> Histórico</a></li>
         <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
         <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
         <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
-        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        <li><a href="secretarias-list.html"><i data-lucide="building-2"></i> Secretarias</a></li>
         </ul>
     </nav>
   </div>
@@ -83,6 +83,10 @@
     </div>
     <a href="departments.html" class="btn-primary"><i data-lucide="plus"></i> Novo Departamento</a>
   </header>
+
+  <div style="margin-bottom:12px;">
+    <input id="searchInput" placeholder="Buscar departamento..." style="width:100%; padding:10px 14px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:0.85rem; font-family:inherit; background:#f8fafc; outline:none; transition:border-color 0.2s;" />
+  </div>
 
   <div class="table-card">
     <table id="deptTable">
@@ -100,6 +104,7 @@
 
   <script>
     const tbody = document.querySelector('#deptTable tbody')
+    let allData = { list: [], secNome: {} }
 
     async function render(){
       tbody.innerHTML = '<tr><td colspan="4" class="empty">Carregando...</td></tr>'
@@ -114,12 +119,19 @@
         return
       }
       const secNome = Object.fromEntries(secretarias.map(s => [s.id, s.nome]))
+      allData = { list, secNome }
       tbody.innerHTML = ''
       if(list.length === 0){
         tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum departamento cadastrado.</td></tr>'
         return
       }
-      list.forEach(d=>{
+      const termo = document.getElementById('searchInput').value.toLowerCase()
+      const filtrados = termo ? list.filter(d => d.nome.toLowerCase().includes(termo) || (secNome[d.secretarias_id] || '').toLowerCase().includes(termo)) : list
+      if(filtrados.length === 0){
+        tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhum departamento encontrado.</td></tr>'
+        return
+      }
+      filtrados.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')).forEach(d=>{
         const tr = document.createElement('tr')
         tr.innerHTML = `
           <td>${escapeHtml(d.nome)}</td>
@@ -150,6 +162,7 @@
       } catch (e) { alert('Falha ao remover.') }
     }
 
+    document.getElementById('searchInput').addEventListener('input', render)
     render()
     if (typeof lucide !== 'undefined') lucide.createIcons()
   </script>

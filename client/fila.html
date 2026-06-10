@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fila de Chamados</title>
+  <title>Histórico de Movimentações</title>
   <style>
     * { box-sizing: border-box; }
-    body { max-width: 1100px; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
+    body { max-width: 100%; margin: 0 auto; padding: 0 16px; color: #1e293b; font-family: 'Inter', Arial, Helvetica, sans-serif; }
     header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
     a.back { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; opacity: 0.9; }
     a.back:hover { opacity: 1; text-decoration: underline; }
@@ -14,35 +14,24 @@
     h1 svg { color: #188331; }
     p.muted { color: #64748b; font-size: 0.85rem; margin: -12px 0 18px; }
 
-    #btn-abrir {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 22px; border: none; border-radius: 10px;
-      font-size: 0.85rem; font-weight: 600; font-family: inherit;
-      cursor: pointer; background: #188331; color: #fff;
-      transition: all 0.2s; margin-bottom: 20px;
-    }
-    #btn-abrir:hover { background: #146a28; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(24,131,49,0.25); }
-    #btn-abrir svg { width: 18px; height: 18px; }
-    #btn-abrir:active { transform: scale(0.97); }
-
     .table-card {
       background: #fff;
       border-radius: 16px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 16px rgba(0,0,0,0.04);
       border: 1px solid #f0f0f0;
-      overflow: hidden;
+      overflow: auto;
       margin-bottom: 32px;
     }
 
-    table { width: 100%; border-collapse: collapse; }
+    table { width: 100%; border-collapse: collapse; overflow-x: auto; }
     th {
-      padding: 12px 14px; font-size: 0.7rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 12px 10px; font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.03em;
       background: #f8fafc; color: #475569;
       border-bottom: 1.5px solid #e2e8f0; text-align: left;
     }
     td {
-      padding: 11px 14px; font-size: 0.85rem; color: #334155;
+      padding: 10px 10px; font-size: 0.8rem; color: #334155;
       border-bottom: 1px solid #f1f5f9; vertical-align: middle;
     }
     tr:last-child td { border-bottom: none; }
@@ -92,11 +81,11 @@
     <nav>
       <ul>
         <li><a href="index.html"><i data-lucide="home"></i> Início</a></li>
-        <li><a href="fila.html"><i data-lucide="clipboard-list"></i> Fila</a></li>
+        <li><a href="fila.html"><i data-lucide="history"></i> Histórico</a></li>
         <li><a href="machines.html"><i data-lucide="monitor"></i> Máquinas</a></li>
         <li><a href="unidades-list.html"><i data-lucide="building"></i> Unidades</a></li>
         <li><a href="departments-list.html"><i data-lucide="folder"></i> Departamentos</a></li>
-        <li><a href="usuarios-list.html"><i data-lucide="users"></i> Usuários</a></li>
+        <li><a href="secretarias-list.html"><i data-lucide="building-2"></i> Secretarias</a></li>
         </ul>
     </nav>
   </div>
@@ -104,14 +93,10 @@
 
   <header>
     <a class="back" href="index.html">← Voltar</a>
-    <h1>Fila de Chamados</h1>
+    <h1><i data-lucide="history"></i> Histórico de Movimentações</h1>
   </header>
 
-
-  <p class="muted">Adicione chamados de máquinas e altere o status entre Aguardando, Em manutenção e Entregue.</p>
-
-
-  <button type="button" id="btn-abrir" onclick="location.href='chamado.html'"><i data-lucide="plus-circle"></i> Abrir Chamado</button>
+  <p class="muted">Registro automático de todas as movimentações de máquinas: entrada, saída, transferências entre departamentos, secretarias e unidades.</p>
 
 
   <div class="table-card">
@@ -119,10 +104,13 @@
     <thead>
       <tr>
         <th>#</th>
-        <th>Máquina</th>
-        <th>Departamento</th>
-        <th>Descrição</th>
-        <th>Status</th>
+        <th>Data/Hora</th>
+        <th>Patrimônio</th>
+        <th>Tipo de Movimentação</th>
+        <th>De (Dept/Sec/Unidade)</th>
+        <th>Para (Dept/Sec/Unidade)</th>
+        <th>Usuário</th>
+        <th>Observação</th>
         <th>Ações</th>
       </tr>
     </thead>
@@ -132,47 +120,75 @@
 
 
   <script>
-    const KEY = 'calls_v1'
+    const KEY = 'historico_movimentacoes_v1'
     const tbody = document.querySelector('#tbl-chamados tbody')
-
+    const auth = (typeof getAuthUser === 'function') ? getAuthUser() : JSON.parse(sessionStorage.getItem('auth_user') || '{}')
+    const privileged = (typeof isPrivilegedUser === 'function') ? isPrivilegedUser() : false
 
     function load(){ try{ return JSON.parse(localStorage.getItem(KEY) || '[]') }catch(e){return[]} }
     function save(list){ localStorage.setItem(KEY, JSON.stringify(list)); render() }
 
-
-    function statusHtml(s){
-      const map = {'Aguardando':'status-waiting clock','Em manutenção':'status-maintenance wrench','Entregue':'status-delivered check-circle'}
-      const [cls, icon] = (map[s]||'').split(' ')
-      return `<span class="status-badge ${cls}"><i data-lucide="${icon}"></i> ${s}</span>`
+    function formatarData(dataIso){
+      const d = new Date(dataIso)
+      return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})
     }
 
+    function tipoBadge(tipo){
+      const colors = {
+        'Entrada': 'background:#dcfce7;color:#15803d',
+        'Saída': 'background:#fee2e2;color:#b91c1c',
+        'Transferência': 'background:#dbeafe;color:#1d4ed8',
+        'Manutenção': 'background:#fef3c7;color:#b45309',
+        'Outro': 'background:#e9d5ff;color:#6b21a8'
+      }
+      const style = colors[tipo] || colors['Outro']
+      return `<span style="${style};display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:0.72rem;font-weight:600;"><i data-lucide="arrow-right"></i> ${tipo}</span>`
+    }
 
     function render(){
       const list = load()
       tbody.innerHTML = ''
-      list.forEach((c,i)=>{
+      if(list.length === 0){
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:32px;">Nenhuma movimentação registrada.</td></tr>'
+        return
+      }
+      // ordenar por data descendente (mais recente primeiro)
+      const sorted = [...list].sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora))
+      const visible = privileged ? sorted : sorted.filter(m => String(m.usuario || '').trim() === String(auth.nome || auth.usuario || '').trim())
+      if (!privileged && visible.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:32px;">Nenhuma movimentação registrada por você.</td></tr>'
+        return
+      }
+      visible.forEach((m,idx)=>{
+        if (!m || typeof m !== 'object') return
         const tr = document.createElement('tr')
-        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(c.machine)}</td><td>${escapeHtml(c.dept)}</td><td>${escapeHtml(c.desc)}</td><td>${statusHtml(c.status)}</td><td class="actions"></td>`
+        const indice = list.length - list.indexOf(m)
+        const de = [m.departamentoAnterior, m.secretariaAnterior, m.unidadeAnterior].filter(x=>x).join(' / ') || '—'
+        const para = [m.departamentoNovo, m.secretariaNova, m.unidadeNova].filter(x=>x).join(' / ') || '—'
+        tr.innerHTML = `<td>${indice}</td><td style="font-size:0.8rem;">${formatarData(m.dataHora)}</td><td>${escapeHtml(m.patrimonio||'')}</td><td>${tipoBadge(m.tipoMovimentacao)}</td><td style="font-size:0.8rem;">${escapeHtml(de)}</td><td style="font-size:0.8rem;">${escapeHtml(para)}</td><td style="font-size:0.8rem;">${escapeHtml(m.usuario||'—')}</td><td style="font-size:0.8rem;max-width:200px;word-wrap:break-word;">${escapeHtml(m.observacao||'')}</td><td class="actions"></td>`
         const actions = tr.querySelector('td:last-child')
-        const select = document.createElement('select')
-        ['Aguardando','Em manutenção','Entregue'].forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; if(s===c.status) o.selected=true; select.appendChild(o) })
-        select.addEventListener('change', ()=>{ c.status = select.value; const l = load(); l[i]=c; save(l) })
-        const editBtn = document.createElement('button'); editBtn.innerHTML = '<i data-lucide="pencil"></i> Editar'; editBtn.className = 'btn btn-secondary btn-sm'; editBtn.addEventListener('click', ()=>{ edit(i) })
-        const delBtn = document.createElement('button'); delBtn.innerHTML = '<i data-lucide="trash-2"></i>'; delBtn.className = 'btn btn-danger btn-sm'; delBtn.title = 'Remover'; delBtn.addEventListener('click', ()=>{ if(confirm('Remover chamado?')){ const l=load(); l.splice(i,1); save(l) } })
-        actions.appendChild(select); actions.appendChild(editBtn); actions.appendChild(delBtn)
+        if (privileged) {
+          const delBtn = document.createElement('button')
+          delBtn.innerHTML = '<i data-lucide="trash-2"></i>'
+          delBtn.className = 'btn btn-danger btn-sm'
+          delBtn.title = 'Remover'
+          delBtn.addEventListener('click', ()=>{ 
+            if(confirm('Remover esta movimentação?')){ 
+              const l=load()
+              const rmIdx = l.indexOf(m)
+              if(rmIdx >= 0) l.splice(rmIdx, 1)
+              save(l) 
+            } 
+          })
+          actions.appendChild(delBtn)
+        }
         tbody.appendChild(tr)
       })
       if (typeof lucide !== 'undefined') lucide.createIcons()
     }
 
-
-    window.edit = function(i){
-      sessionStorage.setItem('editCallIdx', i)
-      window.location.href = 'chamado.html'
-    }
-
-
     render()
+    window.addEventListener('focus', () => { render() })
     if (typeof lucide !== 'undefined') lucide.createIcons()
   </script>
 </body>
