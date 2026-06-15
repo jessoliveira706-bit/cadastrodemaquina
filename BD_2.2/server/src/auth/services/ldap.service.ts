@@ -123,15 +123,4 @@ export async function authenticateViaLdap(
       }
     }
 
-    if (requiredGroup) {
-      const inGroup = groups.some((cn) => cn.toLowerCase() === requiredGroup.toLowerCase());
-      if (!inGroup) return { success: false, reason: "not_in_group" };
-    }
-
-    return { success: true, username, displayName, matricula, groups };
-  } catch {
-    throw new Error("Serviço de autenticação indisponível");
-  } finally {
-    await client.unbind().catch(() => {});
-  }
-}
+    // Permite qualquer usuário LDAP autenticado, sem exigir grupo específico.

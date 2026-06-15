@@ -298,11 +298,6 @@
         const matchSec = !secFilter || String(m.secretarias_id) === secFilter
         return matchPat && matchTipo && matchStatus && matchDept && matchSec
       })
-      // non-privileged users see only machines they created
-      if (!privileged) {
-        const userKey = String(auth.nome || auth.usuario || '').trim()
-        filtered = filtered.filter(m => String(createdByMap[m.patrimonio] || '').trim() === userKey)
-      }
 
       tbody.innerHTML = ''
       if (filtered.length === 0) {

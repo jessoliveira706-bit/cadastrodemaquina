@@ -132,6 +132,40 @@ function highlightActiveLink() {
   });
 }
 
+const THEME_KEY = 'theme_preference';
+
+function getSavedTheme() {
+  return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light';
+}
+
+function applyTheme(theme) {
+  document.documentElement.classList.toggle('theme-dark', theme === 'dark');
+  localStorage.setItem(THEME_KEY, theme);
+  const btn = document.getElementById('btnTheme');
+  if (!btn) return;
+  btn.title = theme === 'dark' ? 'Tema claro' : 'Tema escuro';
+  btn.innerHTML = `<i data-lucide="${theme === 'dark' ? 'sun' : 'moon'}"></i> Tema`;
+}
+
+function toggleTheme() {
+  applyTheme(getSavedTheme() === 'dark' ? 'light' : 'dark');
+}
+
+function setupThemeToggle() {
+  const logout = document.getElementById('btnSair');
+  if (!logout) return;
+  let btn = document.getElementById('btnTheme');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'btnTheme';
+    btn.className = 'btn-theme';
+    btn.addEventListener('click', toggleTheme);
+    logout.insertAdjacentElement('afterend', btn);
+  }
+  applyTheme(getSavedTheme());
+}
+
 function setupSair() {
   const btn = document.getElementById('btnSair');
   if (!btn) return;
@@ -147,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setUserAvatar();
   highlightActiveLink();
   setupSair();
+  setupThemeToggle();
   enforceUiPermissions();
   if (typeof lucide !== 'undefined') lucide.createIcons();
 });
